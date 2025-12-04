@@ -1,20 +1,11 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
 import { AfterUserLoginNavbar } from "../global/AfterUserLoginNavbar";
 import { UserDetails } from "./UserDetails";
 import { QuickLinksUserProfile } from "./QuickLinksUserProfile";
+import DisabilityResumeSection from "./DisabilityResumeSection";
+import ProfileSections from "./ProfileSections";
 
 export default function ProfileDashboard() {
   return (
@@ -23,9 +14,21 @@ export default function ProfileDashboard() {
       <AfterUserLoginNavbar />
 
       {/* MAIN LAYOUT */}
-      <main className="max-w-7xl mx-auto px-6 py-8 ">
-        <UserDetails />
+      <main className="max-w-7xl mx-auto  px-6 py-8 ">
+      <UserDetails />
+     
+        <div className="flex gap-20">
         <QuickLinksUserProfile />
+      <div>
+   <DisabilityResumeSection />
+        <ProfileSections />
+      </div>
+        <div>
+     
+        </div>
+        </div>
+     
+  
       </main>
     </div>
   );
