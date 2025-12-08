@@ -18,7 +18,7 @@ export const UserDetails = () => {
       <EditBasicDetailsModal open={open} setOpen={setOpen} />
 
       {/* PROFILE CARD */}
-      <section className="lg:col-span-12">
+      <div className="lg:col-span-12 pb-5">
         <Card className="rounded-2xl p-6 shadow-md">
           <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
             {/* Left Profile */}
@@ -105,7 +105,7 @@ export const UserDetails = () => {
             </div>
           </div>
         </Card>
-      </section>
+      </div>
     </>
   );
 };

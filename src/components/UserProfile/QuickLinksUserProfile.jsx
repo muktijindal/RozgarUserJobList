@@ -61,7 +61,7 @@ export const QuickLinksUserProfile = () => {
       <UserProjectsModal open={openProjects} setOpen={setopenProjects} />
       <ProfileSummaryModal open={openSummary} setOpen={setopenSummary} />
 
-      <aside className="lg:col-span-3">
+      <div className="lg:col-span-4">
         <Card className="rounded-xl px-2">
           <CardHeader>
             <CardTitle className="text-lg">Quick links</CardTitle>
@@ -87,7 +87,7 @@ export const QuickLinksUserProfile = () => {
             </ul>
           </CardContent>
         </Card>
-      </aside>
+      </div>
     </>
   );
 };

@@ -14,7 +14,7 @@ export const getAllJobs = async () => {
     const data = await res.json();
     console.log("Jobs API Response:", data);
 
-    return data?.jobs || [];
+    return data?.AllJobs || [];
   } catch (error) {
     console.error("Error fetching jobs:", error);
     return [];

@@ -1,18 +1,18 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { JobCard } from "./JobsCard";
+
 import { RecommendedHeader } from "./RecoomendedHeader";
 import { getAllJobs } from "@/components/services/getAllJobs";
-
+import { JobCard } from "./JobsCard";
 
 export const RecommendedJobsSection = () => {
-  const [activeTab, setActiveTab] = useState("Applies");
+  const [activeTab, setActiveTab] = useState("All Jobs");
   const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     const fetchJobs = async () => {
       const data = await getAllJobs();
-      console.log(data, 'alljobs')
+      console.log(data, "alljobs");
       setJobs(data);
     };
 
@@ -20,10 +20,10 @@ export const RecommendedJobsSection = () => {
   }, []);
 
   const tabs = [
-    { name: "Applies", count: jobs.length },
-    { name: "Profile", count: 0 },
-    { name: "Preferences", count: 0 },
-    { name: "You might like", count: jobs.length },
+    { name: "All Jobs", count: jobs.length },
+    // { name: "Profile", count: 0 },
+    // { name: "Preferences", count: jobs.length },
+    // { name: "You might like", count: jobs.length },
   ];
 
   return (
@@ -34,10 +34,21 @@ export const RecommendedJobsSection = () => {
         setActiveTab={setActiveTab}
       />
 
-      {(activeTab === "Applies" || activeTab === "You might like") && (
+      {(activeTab === "All Jobs" || activeTab === "You might like") && (
         <div className="mt-6 space-y-4">
           {jobs.map((job, index) => (
-            <JobCard key={index} {...job} />
+            <JobCard
+              key={index}
+              title={job.jobTitle}
+              company={job.AboutCompany}
+              experience={`${job.experinceFrom} - ${job.experinceTo} yrs`}
+              salary={`${job.salaryRangeFrom} - ${job.salaryRangeTo}`}
+              location={`${job.jobLocation?.city}, ${job.jobLocation?.state}, ${job.jobLocation?.country}`}
+              description={job.jobDescription}
+              skills={job.skills || []}
+              posted={`Posted on ${new Date(job.created_at).toDateString()}`}
+              logo="/default-logo.png" // if no logo in API
+            />
           ))}
         </div>
       )}
