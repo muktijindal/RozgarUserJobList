@@ -7,7 +7,7 @@ import { FaEdit } from "react-icons/fa";
 import { Button } from "../ui/button";
 import { Badge } from "lucide-react";
 import EditBasicDetailsModal from "./EditUserBasicDetailsModal";
-
+import Link from "next/link";
 
 export const UserDetails = () => {
   const [open, setOpen] = useState(false);
@@ -31,7 +31,9 @@ export const UserDetails = () => {
 
                 <div className="absolute -right-2 bottom-0 w-14 h-14 rounded-full bg-white flex items-center justify-center shadow">
                   <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                    <div className="text-sm text-red-500 font-semibold">18%</div>
+                    <div className="text-sm text-red-500 font-semibold">
+                      18%
+                    </div>
                   </div>
                 </div>
               </div>
@@ -51,7 +53,8 @@ export const UserDetails = () => {
                 </div>
 
                 <p className="text-sm text-gray-500 mt-1">
-                  Profile last updated - <span className="font-medium">Today</span>
+                  Profile last updated -{" "}
+                  <span className="font-medium">Today</span>
                 </p>
 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
@@ -91,8 +94,11 @@ export const UserDetails = () => {
                     <Badge className="bg-green-100 text-green-700">+2%</Badge>
                   </div>
 
-                  <Button className="mt-4 w-full bg-rose-500 text-white hover:bg-rose-600">
-                    Add 13 missing details
+                  <Button
+                    asChild
+                    className="mt-4 w-full bg-rose-500 text-white hover:bg-rose-600"
+                  >
+                    <Link href="/pending-action">Add 13 missing details</Link>
                   </Button>
                 </div>
               </div>

@@ -42,21 +42,25 @@ const Login = () => {
       } else {
         alert("Login Successful!");
 
-        // ✅ Correct token location: data.data.token
         const token = data?.data?.token;
+
         if (token) {
-          localStorage.setItem("token", token);
-          console.log("Token saved:", token);
+          // ✅ Save token in cookie (NOT localStorage)
+          document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax;`;
+
+          console.log("Token saved in cookie:", token);
         } else {
           console.log("❌ Token missing from response");
         }
 
-        // ✅ Save user info
+        // Save user info in cookie too (optional)
         if (data?.data?.user) {
-          localStorage.setItem("user", JSON.stringify(data.data.user));
+          document.cookie = `user=${encodeURIComponent(
+            JSON.stringify(data.data.user)
+          )}; path=/; max-age=604800; SameSite=Lax;`;
         }
 
-        // Redirect after login
+        // Redirect
         window.location.href = "/";
       }
     } catch (error) {
