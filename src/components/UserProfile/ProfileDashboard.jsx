@@ -15,20 +15,16 @@ export default function ProfileDashboard() {
 
       {/* MAIN LAYOUT */}
       <main className="max-w-7xl mx-auto  px-6 py-8 ">
-      <UserDetails />
-     
+        <UserDetails />
+
         <div className="flex gap-20">
-        <QuickLinksUserProfile />
-      <div>
-   <DisabilityResumeSection />
-        <ProfileSections />
-      </div>
-        <div>
-     
+          <QuickLinksUserProfile />
+          <div>
+            <DisabilityResumeSection />
+            <ProfileSections />
+          </div>
+          <div></div>
         </div>
-        </div>
-     
-  
       </main>
     </div>
   );
