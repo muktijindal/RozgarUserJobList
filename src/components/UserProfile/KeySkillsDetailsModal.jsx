@@ -46,7 +46,7 @@ export default function KeySkillsModal({ open, setOpen }) {
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             Key skills
-            <span className="text-green-600 font-medium text-sm">Add 8%</span>
+            {/* <span className="text-green-600 font-medium text-sm">Add 8%</span> */}
           </DialogTitle>
         </DialogHeader>
 

@@ -67,11 +67,11 @@ export default function DisabilityResumeSection() {
       {/* Resume Section */}
       <Card className="rounded-2xl shadow-sm bg-white p-0 overflow-hidden">
         <CardContent className="px-6 py-5">
-          <div className="flex justify-between items-center">
+          {/* <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">
               Resume <span className="text-green-600">Add 10%</span>
             </h2>
-          </div>
+          </div> */}
 
           <p className="text-sm text-gray-600 mt-1">
             70% of recruiters discover candidates through their resume

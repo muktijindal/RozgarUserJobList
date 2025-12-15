@@ -23,11 +23,11 @@ export const DiversityUserProfile = () => {
 
     {/* Resume Card */}
     <Card className="rounded-xl p-6">
-      <div className="flex items-center justify-between">
+      {/* <div className="flex items-center justify-between">
         <h4 className="text-lg font-semibold">
           Resume <span className="text-green-600">Add 10%</span>
         </h4>
-      </div>
+      </div> */}
 
       <p className="text-sm text-gray-500 mt-2">
         70% of recruiters discover candidates through their resume

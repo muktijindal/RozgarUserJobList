@@ -18,7 +18,7 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             Education{" "}
-            <span className="text-green-600 font-medium text-sm">Add 10%</span>
+            {/* <span className="text-green-600 font-medium text-sm">Add 10%</span> */}
           </DialogTitle>
         </DialogHeader>
 

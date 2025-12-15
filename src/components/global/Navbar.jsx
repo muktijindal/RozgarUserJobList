@@ -45,7 +45,7 @@ export const Navbar = () => {
             </li>
             
             
-            <li>
+            {/* <li>
               <a
                 href="/userwebsite/service"
                 className="text-black hover:text-[#A270FF] transition-colors duration-200 text-lg"
@@ -53,7 +53,7 @@ export const Navbar = () => {
               >
                 Service
               </a>
-            </li>
+            </li> */}
             <li>
               <a href="/userwebsite/recommendedjobs" className="hover:text-[#A270FF] transition-colors duration-200">Jobs</a>
 
@@ -113,9 +113,9 @@ export const Navbar = () => {
             <li>
               <a href="/userwebsite" className="hover:text-[#A270FF] transition-colors duration-200">Home</a>
             </li>
-            <li>
+            {/* <li>
               <a href="/userwebsite/service" className="hover:text-[#A270FF] transition-colors duration-200">Service</a>
-            </li>
+            </li> */}
             <li>
               <a href="/userwebsite/recommendedjobs" className="hover:text-[#A270FF] transition-colors duration-200">Jobs</a>
             </li>
@@ -130,7 +130,7 @@ export const Navbar = () => {
           <a href="/profile" className="px-4 py-2 bg-[#A270FF1A] rounded-xl text-sm hover:bg-[#A270FF33] transition-colors duration-200">
             Profile
           </a>
-          <a href="/contactus" className="px-4 py-2 bg-black text-white rounded-xl text-sm hover:bg-gray-800 transition-colors duration-200">
+          <a href="/contact-us" className="px-4 py-2 bg-black text-white rounded-xl text-sm hover:bg-gray-800 transition-colors duration-200">
             Contact Us
           </a>
         </div>

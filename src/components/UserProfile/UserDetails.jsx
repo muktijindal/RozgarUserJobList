@@ -23,7 +23,7 @@ export const UserDetails = () => {
           <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
             {/* Left Profile */}
             <div className="flex items-center gap-6 w-full lg:w-auto">
-              <div className="relative">
+              {/* <div className="relative">
                 <Avatar className="w-28 h-28">
                   <AvatarImage src="/avatar-placeholder.png" alt="avatar" />
                   <AvatarFallback>R</AvatarFallback>
@@ -36,7 +36,7 @@ export const UserDetails = () => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Info */}
               <div className="flex-1">

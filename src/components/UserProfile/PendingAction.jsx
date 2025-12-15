@@ -196,7 +196,7 @@ export default function ProfilePendingActions() {
             <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
               <div
                 className="bg-black h-2 rounded-full"
-                style={{ width: "18%" }}
+          
               ></div>
             </div>
 

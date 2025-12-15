@@ -17,7 +17,7 @@ export default function ITSkillsModal({ open, setOpen }) {
         <DialogHeader>
           <DialogTitle className="text-xl flex items-center gap-2">
             IT skills
-            <span className="text-green-600 font-medium text-sm">Add 10%</span>
+            {/* <span className="text-green-600 font-medium text-sm">Add 10%</span> */}
           </DialogTitle>
         </DialogHeader>
 

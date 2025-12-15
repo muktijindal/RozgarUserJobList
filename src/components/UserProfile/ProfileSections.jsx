@@ -12,7 +12,8 @@ export default function ProfileSections() {
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              Resume headline <span className="text-green-600 text-sm font-medium">Add 8%</span>
+              Resume headline 
+              {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
             <button className="text-blue-600 text-sm">Add resume headline</button>
@@ -29,7 +30,8 @@ export default function ProfileSections() {
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              Key skills <span className="text-green-600 text-sm font-medium">Add 8%</span>
+              Key skills
+               {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
             <button className="text-blue-600 text-sm">Add key skills</button>
@@ -61,7 +63,8 @@ export default function ProfileSections() {
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              Education <span className="text-green-600 text-sm font-medium">Add 10%</span>
+              Education 
+              {/* <span className="text-green-600 text-sm font-medium">Add 10%</span> */}
             </h2>
 
             <button className="text-blue-600 text-sm">Add education</button>
@@ -88,7 +91,8 @@ export default function ProfileSections() {
   <CardContent className="px-6 py-5">
     <div className="flex justify-between items-center">
       <h2 className="text-lg font-semibold flex items-center gap-2">
-        IT skills <span className="text-green-600 text-sm font-medium">Add 10%</span>
+        IT skills 
+        {/* <span className="text-green-600 text-sm font-medium">Add 10%</span> */}
       </h2>
 
       <button className="text-blue-600 text-sm">Add details</button>
@@ -105,7 +109,8 @@ export default function ProfileSections() {
   <CardContent className="px-6 py-5">
     <div className="flex justify-between items-center">
       <h2 className="text-lg font-semibold flex items-center gap-2">
-        Projects <span className="text-green-600 text-sm font-medium">Add 8%</span>
+        Projects
+         {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
       </h2>
 
       <button className="text-blue-600 text-sm">Add project</button>
