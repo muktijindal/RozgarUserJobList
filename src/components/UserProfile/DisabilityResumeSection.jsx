@@ -77,7 +77,7 @@ export default function DisabilityResumeSection() {
             70% of recruiters discover candidates through their resume
           </p>
 
-          <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-6">
+          {/* <div className="flex flex-col md:flex-row items-center justify-between mt-6 gap-6">
             <div className="flex items-center gap-4">
               <div className="w-24 h-28 bg-gray-100 rounded-lg"></div>
 
@@ -94,7 +94,7 @@ export default function DisabilityResumeSection() {
             <button className="px-5 py-2 bg-blue-600 text-white rounded-full text-sm">
               Create resume
             </button>
-          </div>
+          </div> */}
 
           {/* Upload Resume */}
           <div className="mt-8 border rounded-xl p-4 text-center">

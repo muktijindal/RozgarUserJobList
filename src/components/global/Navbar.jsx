@@ -1,138 +1,150 @@
-'use client';
-import React, { useState } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import Link from 'next/link';
-import Image from 'next/image';
+"use client";
 
-// import logo from '../../../../public/images/logo.svg'
+import React, { useState, useRef, useEffect } from "react";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
 export const Navbar = () => {
+  const pathname = usePathname();
+  const router = useRouter();
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // 🚫 Hide navbar on auth pages
+  const hideNavbarRoutes = ["/login", "/signup", "/forgotpassword"];
+  if (hideNavbarRoutes.includes(pathname)) {
+    return null;
+  }
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Logout handler
+  const handleLogout = () => {
+    localStorage.removeItem("token"); // 🔑 clear auth token
+    setIsDropdownOpen(false);
+    router.push("/login"); // redirect after logout
+  };
 
   return (
     <>
       {/* Mobile Sidebar Overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 ${
-          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+          isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
         } md:hidden`}
         onClick={() => setIsMenuOpen(false)}
-      ></div>
+      />
 
       {/* Mobile Sidebar */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          isMenuOpen ? "translate-x-0" : "-translate-x-full"
         } md:hidden`}
       >
         <div className="p-4 flex justify-end">
-          <button onClick={() => setIsMenuOpen(false)} className="text-black">
+          <button onClick={() => setIsMenuOpen(false)}>
             <FaTimes size={24} />
           </button>
         </div>
 
-        {/* Centered navigation items at top */}
         <nav className="px-4">
-          <ul className="flex flex-col items-center space-y-8 mt-4">
-            <li>
-              <a
-                href="/userwebsite"
-                className="text-black hover:text-[#A270FF] transition-colors duration-200 text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </a>
-            </li>
-            
-            
-            {/* <li>
-              <a
-                href="/userwebsite/service"
-                className="text-black hover:text-[#A270FF] transition-colors duration-200 text-lg"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Service
-              </a>
-            </li> */}
-            <li>
-              <a href="/userwebsite/recommendedjobs" className="hover:text-[#A270FF] transition-colors duration-200">Jobs</a>
+          <ul className="flex flex-col items-center space-y-6 mt-4">
+            <li><Link href="/userwebsite">Home</Link></li>
+            <li><Link href="/userwebsite/recommendedjobs">Jobs</Link></li>
+            <li><Link href="/profile">Profile</Link></li>
 
-            </li>
             <li>
-              <a
-                href="/contactus"
-                className="text-black hover:text-[#A270FF] transition-colors duration-200 text-lg"
-                onClick={() => setIsMenuOpen(false)}
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 bg-red-500 text-white rounded-xl"
               >
-                Contact Us
-              </a>
-            </li>
-            
-            <li>
-              <a
-                href="/profile"
-                className="block px-4 py-2 bg-[#A270FF1A] rounded-xl text-black hover:bg-[#A270FF33] transition-colors duration-200 text-lg text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Profile
-              </a>
-            </li>
-            <li>
-              <a
-                href="/contactus"
-                className="block px-4 py-2 bg-black text-white rounded-xl hover:bg-gray-800 transition-colors duration-200 text-lg text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Contact Us
-              </a>
+                Logout
+              </button>
             </li>
           </ul>
         </nav>
       </div>
 
       {/* Main Header */}
-      <header className="flex items-center justify-between px-4 sm:px-6 py-4 text-black shadow-md">
-        {/* Logo and Hamburger (mobile) */}
+      <header className="flex items-center justify-between px-4 sm:px-6 py-4 shadow-md bg-white">
+        {/* Left */}
         <div className="flex items-center">
-          <button 
-            className="mr-4 text-black md:hidden"
+          <button
+            className="mr-4 md:hidden"
             onClick={() => setIsMenuOpen(true)}
           >
             <FaBars size={24} />
           </button>
-          <h1 className="text-xl sm:text-2xl font-bold">
-            {/* <Link href="/" className="block">
-              <Image src={logo} width={192} height={28} alt='Logo' />
-            </Link> */}
-          </h1>
+
+          <Link href="/userwebsite" className="text-xl font-bold">
+            LOGO
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
           <ul className="flex space-x-6 text-sm">
             <li>
-              <a href="/userwebsite" className="hover:text-[#A270FF] transition-colors duration-200">Home</a>
-            </li>
-            {/* <li>
-              <a href="/userwebsite/service" className="hover:text-[#A270FF] transition-colors duration-200">Service</a>
-            </li> */}
-            <li>
-              <a href="/userwebsite/recommendedjobs" className="hover:text-[#A270FF] transition-colors duration-200">Jobs</a>
+              <Link href="/userwebsite" className="hover:text-[#A270FF]">
+                Home
+              </Link>
             </li>
             <li>
-              <a href="/contact-us" className="hover:text-[#A270FF] transition-colors duration-200">Contact Us</a>
+              <Link
+                href="/userwebsite/recommendedjobs"
+                className="hover:text-[#A270FF]"
+              >
+                Jobs
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact-us" className="hover:text-[#A270FF]">
+                Contact Us
+              </Link>
             </li>
           </ul>
         </nav>
 
-        {/* Desktop Buttons */}
-        <div className="hidden md:flex items-center space-x-4">
-          <a href="/profile" className="px-4 py-2 bg-[#A270FF1A] rounded-xl text-sm hover:bg-[#A270FF33] transition-colors duration-200">
-            Profile
-          </a>
-          <a href="/contact-us" className="px-4 py-2 bg-black text-white rounded-xl text-sm hover:bg-gray-800 transition-colors duration-200">
-            Contact Us
-          </a>
+        {/* Profile Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            className="flex items-center gap-2 px-3 py-2 bg-[#A270FF1A] rounded-xl"
+          >
+            <FaUserCircle size={22} />
+            <span className="text-sm">Account</span>
+          </button>
+
+          {isDropdownOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg rounded-xl border z-50">
+              <Link
+                href="/profile"
+                onClick={() => setIsDropdownOpen(false)}
+                className="block px-4 py-2 hover:bg-gray-100 text-sm"
+              >
+                Profile
+              </Link>
+
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 text-sm"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </header>
     </>

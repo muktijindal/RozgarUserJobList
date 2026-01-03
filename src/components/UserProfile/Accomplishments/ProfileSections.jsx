@@ -1,9 +1,27 @@
 "use client";
 
-import React from "react";
-import { Card, CardContent } from "../ui/card";
+import React, { useState } from "react";
+import { Card, CardContent } from "../../ui/card";
+import { Accomplisment } from "./Accomplisment";
+import ProfileSummaryModal from "../ProfileSummaryModal";
+import UserProjectsModal from "../UserProjectsModal";
+import ITSkillsModal from "../ITSkillsModal";
+import EducationUserDetailsModal from "../EducatioUserDetailsModal";
+import KeySkillsModal from "../KeySkillsDetailsModal";
+import HeadlineModal from "../HeadlineModal";
+import EmploymentModal from "../EmploymentModal";
 
 export default function ProfileSections() {
+
+   const [openSummary, setopenSummary] = useState(false);
+    const [openProjects, setopenProjects] = useState(false);
+     const [openITSkills, setopenITSkills] = useState(false);
+     const [openHeadline, setOpenHeadline] = useState(false);
+const [openKeySkills, setOpenKeySkills] = useState(false);
+const [openEducation, setOpenEducation] = useState(false);
+const [openEmployment, setOpenEmployment] = useState(false);
+
+ 
   return (
     <div className="space-y-6">
 
@@ -16,7 +34,13 @@ export default function ProfileSections() {
               {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
-            <button className="text-blue-600 text-sm">Add resume headline</button>
+            <button
+  onClick={() => setOpenHeadline(true)}
+  className="text-blue-600 text-sm"
+>
+  Add resume headline
+</button>
+
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -34,7 +58,13 @@ export default function ProfileSections() {
                {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
-            <button className="text-blue-600 text-sm">Add key skills</button>
+            <button
+  onClick={() => setOpenKeySkills(true)}
+  className="text-blue-600 text-sm"
+>
+  Add key skills
+</button>
+
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -49,7 +79,13 @@ export default function ProfileSections() {
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Employment</h2>
 
-            <button className="text-blue-600 text-sm">Add employment</button>
+            <button
+  onClick={() => setOpenEmployment(true)}
+  className="text-blue-600 text-sm"
+>
+  Add employment
+</button>
+
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -67,7 +103,13 @@ export default function ProfileSections() {
               {/* <span className="text-green-600 text-sm font-medium">Add 10%</span> */}
             </h2>
 
-            <button className="text-blue-600 text-sm">Add education</button>
+            <button
+  onClick={() => setOpenEducation(true)}
+  className="text-blue-600 text-sm"
+>
+  Add education
+</button>
+
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -87,15 +129,20 @@ export default function ProfileSections() {
       </Card>
 
       {/* IT Skills */}
+{/* IT Skills */}
 <Card className="rounded-2xl shadow-sm bg-white p-0">
   <CardContent className="px-6 py-5">
     <div className="flex justify-between items-center">
       <h2 className="text-lg font-semibold flex items-center gap-2">
-        IT skills 
-        {/* <span className="text-green-600 text-sm font-medium">Add 10%</span> */}
+        IT skills
       </h2>
 
-      <button className="text-blue-600 text-sm">Add details</button>
+      <button
+        onClick={() => setopenITSkills(true)}
+        className="text-blue-600 text-sm"
+      >
+        Add details
+      </button>
     </div>
 
     <p className="text-sm text-gray-600 mt-2">
@@ -104,16 +151,21 @@ export default function ProfileSections() {
   </CardContent>
 </Card>
 
+
 {/* Projects */}
 <Card className="rounded-2xl shadow-sm bg-white p-0">
   <CardContent className="px-6 py-5">
     <div className="flex justify-between items-center">
       <h2 className="text-lg font-semibold flex items-center gap-2">
         Projects
-         {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
       </h2>
 
-      <button className="text-blue-600 text-sm">Add project</button>
+      <button
+        onClick={() => setopenProjects(true)}
+        className="text-blue-600 text-sm"
+      >
+        Add project
+      </button>
     </div>
 
     <p className="text-sm text-gray-600 mt-2">
@@ -122,72 +174,69 @@ export default function ProfileSections() {
   </CardContent>
 </Card>
 
+
 {/* Profile Summary */}
 <Card className="rounded-2xl shadow-sm bg-white p-0">
-  <CardContent className="px-6 py-5">
-    <div className="flex justify-between items-center">
-      <h2 className="text-lg font-semibold">Profile summary</h2>
+        <CardContent className="px-6 py-5">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Profile summary</h2>
 
-      <button className="text-blue-600 text-sm">Add profile summary</button>
-    </div>
+            <button
+              onClick={() => setopenSummary(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add profile summary
+            </button>
+          </div>
 
-    <p className="text-sm text-gray-600 mt-2">
-      Highlight your key career achievements to help employers know your potential
-    </p>
-  </CardContent>
-</Card>
+          <p className="text-sm text-gray-600 mt-2">
+            Highlight your key career achievements to help employers know your potential
+          </p>
+        </CardContent>
+      </Card>
 
-{/* Accomplishments */}
-<Card className="rounded-2xl shadow-sm bg-white p-0">
-  <CardContent className="px-6 py-5">
-    <h2 className="text-lg font-semibold">Accomplishments</h2>
+<Accomplisment />
 
-    <p className="text-sm text-gray-600 mt-2">
-      Showcase your credentials by adding relevant certifications, work samples, online profiles, etc.
-    </p>
 
-    {/* Sub Fields */}
-    <div className="flex flex-col gap-4 mt-6">
 
-      {/* Online Profile */}
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-medium">Online profile</p>
-          <p className="text-sm text-gray-600">Add link to online professional profiles (e.g. LinkedIn, etc.)</p>
-        </div>
-        <button className="text-blue-600 text-sm">Add</button>
-      </div>
+<UserProjectsModal
+open={openProjects} 
+setOpen={setopenProjects}
+  onSave={(data) => {
+    console.log("Project saved:", data);
+    // 🔹 API integration here
+  }}
+/>
 
-      {/* Work Sample */}
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-medium">Work sample</p>
-          <p className="text-sm text-gray-600">Link relevant work samples (e.g. Github, Behance)</p>
-        </div>
-        <button className="text-blue-600 text-sm">Add</button>
-      </div>
+    <ProfileSummaryModal open={openSummary} setOpen={setopenSummary} />
 
-      {/* Research / Publication */}
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-medium">White paper / Research publication / Journal entry</p>
-          <p className="text-sm text-gray-600">Add links to your online publications</p>
-        </div>
-        <button className="text-blue-600 text-sm">Add</button>
-      </div>
+<ITSkillsModal open={openITSkills} setOpen={setopenITSkills} />
 
-      {/* Presentation */}
-      <div className="flex justify-between items-center">
-        <div>
-          <p className="font-medium">Presentation</p>
-          <p className="text-sm text-gray-600">Add links to your presentations</p>
-        </div>
-        <button className="text-blue-600 text-sm">Add</button>
-      </div>
+{/* Resume Headline */}
+<HeadlineModal
+  open={openHeadline}
+  setOpen={setOpenHeadline}
+/>
 
-    </div>
-  </CardContent>
-</Card>
+{/* Key Skills */}
+<KeySkillsModal
+  open={openKeySkills}
+  setOpen={setOpenKeySkills}
+/>
+
+{/* Employment */}
+<EmploymentModal
+  open={openEmployment}
+  setOpen={setOpenEmployment}
+/>
+
+{/* Education */}
+<EducationUserDetailsModal
+  open={openEducation}
+  setOpen={setOpenEducation}
+/>
+
+
 
     </div>
   );

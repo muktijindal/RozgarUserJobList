@@ -5,7 +5,7 @@ import React from "react";
 import { UserDetails } from "./UserDetails";
 import { QuickLinksUserProfile } from "./QuickLinksUserProfile";
 import DisabilityResumeSection from "./DisabilityResumeSection";
-import ProfileSections from "./ProfileSections";
+import ProfileSections from "./Accomplishments/ProfileSections";
 
 export default function ProfileDashboard() {
   return (

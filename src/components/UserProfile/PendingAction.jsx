@@ -1,8 +1,11 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { DiversityUserProfile } from "./DiversityUserProfile";
 
 export default function ProfilePendingActions() {
+  const router = useRouter();
+
   // FIRST SET OF ACTIONS
   const actions = [
     {
@@ -12,9 +15,7 @@ export default function ProfilePendingActions() {
         "Verify your mobile number to increase your chances of getting contacted by recruiters",
       value: "9355839665",
       actionText: "Verify",
-      link: "#",
       editText: "Edit",
-      editLink: "#",
     },
     {
       title: "Verify email",
@@ -23,7 +24,6 @@ export default function ProfilePendingActions() {
         "Recruiters are more likely to contact candidates with verified emails",
       value: "jindalmukti51@gmail.com",
       actionText: "Verify",
-      link: "#",
     },
     {
       title: "Desired job location",
@@ -31,11 +31,10 @@ export default function ProfilePendingActions() {
       description:
         "This will help us personalize your job recommendations",
       actionText: "Add location",
-      link: "#",
     },
   ];
 
-  // SECOND SET (Your screenshot items)
+  // SECOND SET
   const moreActions = [
     {
       title: "Department",
@@ -43,7 +42,6 @@ export default function ProfilePendingActions() {
       description:
         "Tell us more about what department you work in or have previously worked in",
       actionText: "Add department",
-      link: "#",
     },
     {
       title: "Industry type",
@@ -51,7 +49,6 @@ export default function ProfilePendingActions() {
       description:
         "Tell us about your industry preferences. This will help us personalize your job recommendations.",
       actionText: "Add industry",
-      link: "#",
     },
     {
       title: "Upload photo",
@@ -59,7 +56,6 @@ export default function ProfilePendingActions() {
       description:
         "Profile with photo has 40% higher chances of getting noticed by recruiters",
       actionText: "Upload photo",
-      link: "#",
     },
     {
       title: "Projects",
@@ -67,7 +63,6 @@ export default function ProfilePendingActions() {
       description:
         "Add details about the projects you have done in college, internship or at work.",
       actionText: "Add project",
-      link: "#",
     },
     {
       title: "Resume headline",
@@ -75,7 +70,6 @@ export default function ProfilePendingActions() {
       description:
         "Add a summary of your resume to introduce yourself to recruiters",
       actionText: "Add resume headline",
-      link: "#",
     },
     {
       title: "Personal details",
@@ -83,7 +77,6 @@ export default function ProfilePendingActions() {
       description:
         "This information is important for employers to know you better",
       actionText: "Add personal details",
-      link: "#",
     },
     {
       title: "Language proficiency",
@@ -91,15 +84,13 @@ export default function ProfilePendingActions() {
       description:
         "Strengthen your resume by letting recruiters know you can communicate in multiple languages",
       actionText: "Add languages",
-      link: "#",
     },
     {
       title: "Education",
       add: "+2%",
       description:
         "Your qualifications help employers know your educational background",
-      actionText: "Add Education",
-      link: "#",
+      actionText: "Add education",
     },
     {
       title: "Key skills",
@@ -107,7 +98,6 @@ export default function ProfilePendingActions() {
       description:
         "Recruiters look for candidates with specific key skills. We will send you job recommendations based on these skills.",
       actionText: "Add skills",
-      link: "#",
     },
   ];
 
@@ -124,26 +114,32 @@ export default function ProfilePendingActions() {
               key={idx}
               className="bg-white shadow-sm border rounded-xl p-5"
             >
-              {/* Title */}
               <div className="flex items-center gap-2">
                 <p className="text-lg font-semibold">{item.title}</p>
                 <span className="text-green-600 font-semibold">{item.add}</span>
               </div>
 
-              {/* Description */}
               <p className="text-gray-600 mt-1">{item.description}</p>
 
-              {/* Value + Actions */}
-              <div className="mt-2 flex items-center gap-3 text-blue-600 font-medium">
-                {item.value && <span className="text-black">{item.value}</span>}
-                <a href={item.link} className="hover:underline">
+              <div className="mt-2 flex items-center gap-4">
+                {item.value && (
+                  <span className="text-black">{item.value}</span>
+                )}
+
+                <button
+                  onClick={() => router.push("/profile")}
+                  className="text-blue-600 font-medium hover:underline"
+                >
                   {item.actionText}
-                </a>
+                </button>
 
                 {item.editText && (
-                  <a href={item.editLink} className="hover:underline">
+                  <button
+                    onClick={() => router.push("/profile")}
+                    className="text-blue-600 font-medium hover:underline"
+                  >
                     {item.editText}
-                  </a>
+                  </button>
                 )}
               </div>
             </div>
@@ -158,7 +154,6 @@ export default function ProfilePendingActions() {
               className="bg-white shadow-sm border rounded-xl p-5"
             >
               <div className="flex justify-between items-start">
-                {/* Left Text */}
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="text-lg font-semibold">{item.title}</p>
@@ -169,13 +164,12 @@ export default function ProfilePendingActions() {
                   <p className="text-gray-600 mt-1">{item.description}</p>
                 </div>
 
-                {/* Right Action */}
-                <a
-                  href={item.link}
+                <button
+                  onClick={() => router.push("/profile")}
                   className="text-blue-600 font-medium hover:underline whitespace-nowrap"
                 >
                   {item.actionText}
-                </a>
+                </button>
               </div>
             </div>
           ))}
@@ -184,7 +178,7 @@ export default function ProfilePendingActions() {
         <DiversityUserProfile />
       </div>
 
-      {/* RIGHT SIDE — Profile completeness */}
+      {/* RIGHT SIDE */}
       <div className="w-full lg:w-1/3">
         <div className="bg-white border shadow-sm rounded-xl p-6">
           <h3 className="text-xl font-semibold">Profile completeness</h3>
@@ -192,15 +186,13 @@ export default function ProfilePendingActions() {
           <div className="mt-3">
             <p className="text-gray-700">Profile completed</p>
 
-            {/* Progress Bar */}
             <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
-              <div
-                className="bg-black h-2 rounded-full"
-          
-              ></div>
+              <div className="bg-black h-2 rounded-full w-[18%]" />
             </div>
 
-            <p className="text-right mt-2 font-medium text-gray-800">18%</p>
+            <p className="text-right mt-2 font-medium text-gray-800">
+              18%
+            </p>
           </div>
         </div>
       </div>
