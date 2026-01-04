@@ -27,7 +27,6 @@ const Login = () => {
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify({
           email: formData.emailOrPhone,
           password: formData.password,
@@ -45,22 +44,22 @@ const Login = () => {
         const token = data?.data?.token;
 
         if (token) {
-          // ✅ Save token in cookie (NOT localStorage)
-          document.cookie = `token=${token}; path=/; max-age=604800; SameSite=Lax;`;
-
-          console.log("Token saved in cookie:", token);
+          // ✅ FIX: store token in localStorage
+          localStorage.setItem("token", token);
+          console.log("Token saved in localStorage:", token);
         } else {
           console.log("❌ Token missing from response");
         }
 
-        // Save user info in cookie too (optional)
+        // optional user info
         if (data?.data?.user) {
-          document.cookie = `user=${encodeURIComponent(
+          localStorage.setItem(
+            "user",
             JSON.stringify(data.data.user)
-          )}; path=/; max-age=604800; SameSite=Lax;`;
+          );
         }
 
-        // Redirect
+        // redirect
         window.location.href = "/";
       }
     } catch (error) {
@@ -77,7 +76,6 @@ const Login = () => {
         <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Email or Phone */}
           <div>
             <label className="block font-medium mb-1">
               Email or Phone Number
@@ -93,7 +91,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Password */}
           <div>
             <label className="block font-medium mb-1">Password</label>
             <input

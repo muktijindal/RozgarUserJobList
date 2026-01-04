@@ -65,7 +65,7 @@ export default function DisabilityResumeSection() {
 
 
       {/* Resume Section */}
-      <Card className="rounded-2xl shadow-sm bg-white p-0 overflow-hidden">
+      <Card className="rounded-2xl shadow-sm bg-white p-0 mb-4 overflow-hidden">
         <CardContent className="px-6 py-5">
           {/* <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">
