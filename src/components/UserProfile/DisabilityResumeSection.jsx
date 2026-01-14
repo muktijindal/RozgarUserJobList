@@ -22,7 +22,7 @@ export default function DisabilityResumeSection() {
     <p className="text-lg font-medium">
       Companies want to build inclusive teams, help us identify your disability status for better jobs.
     </p>
-    <span className="text-xs text-purple-600 font-medium">Diversity & inclusion</span>
+    {/* <span className="text-xs text-purple-600 font-medium">Diversity & inclusion</span> */}
   </div>
 
   {/* Option Buttons */}

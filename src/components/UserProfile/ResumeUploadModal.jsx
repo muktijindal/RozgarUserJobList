@@ -5,18 +5,58 @@ import React, { useState } from "react";
 
 export default function ResumeUploadModal({ open, setOpen }) {
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
 
-  const handleUpload = () => {
-    if (!file) return alert("Please select a file");
+  const handleUpload = async () => {
+    if (!file) {
+      alert("Please select a file");
+      return;
+    }
 
-    // TODO: API Call for Resume Upload
-    console.log("Uploading resume:", file);
+    const token = localStorage.getItem("token"); // or from cookies if you store there
 
-    setOpen(false);
+    if (!token) {
+      alert("User not authenticated");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("resume", file);
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("http://147.93.72.227:5000/api/users/upload-resume", {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // ❌ DO NOT set Content-Type here
+        },
+        body: formData,
+        credentials: "include", // needed if backend uses cookies
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data?.message || "Resume upload failed");
+        return;
+      }
+
+      alert("Resume uploaded successfully ✅");
+      setOpen(false);
+      setFile(null);
+
+    } catch (error) {
+      console.error("Upload error:", error);
+      alert("Something went wrong while uploading");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,7 +76,12 @@ export default function ResumeUploadModal({ open, setOpen }) {
             <div className="px-4 py-2 bg-blue-600 text-white rounded-md inline-block">
               Choose File
             </div>
-            <input type="file" className="hidden" accept=".pdf,.doc,.docx" onChange={handleFileChange} />
+            <input
+              type="file"
+              className="hidden"
+              accept=".pdf,.doc,.docx"
+              onChange={handleFileChange}
+            />
           </label>
 
           {file && (
@@ -51,15 +96,17 @@ export default function ResumeUploadModal({ open, setOpen }) {
           <button
             onClick={() => setOpen(false)}
             className="px-4 py-2 border rounded-md text-sm"
+            disabled={loading}
           >
             Cancel
           </button>
 
           <button
             onClick={handleUpload}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm"
+            disabled={loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm disabled:bg-gray-400"
           >
-            Upload
+            {loading ? "Uploading..." : "Upload"}
           </button>
         </div>
       </DialogContent>
