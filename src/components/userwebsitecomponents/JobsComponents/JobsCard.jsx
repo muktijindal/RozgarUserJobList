@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   FaBriefcase,
   FaRupeeSign,
@@ -8,6 +8,17 @@ import {
   FaBookmark,
   FaStar,
 } from "react-icons/fa";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+
 
 const slugify = (text) =>
   (text ?? "job")
@@ -26,21 +37,83 @@ export const JobCard = ({
   salary,
   location,
   description,
-  skills = [],
+  skills,
   posted,
   logo,
 
   // 🔥 NEW PROPS
   isSaved = false,
   onUnsaveSuccess,
+  appliedBadge = false,
 }) => {
   const router = useRouter();
   const slug = `${slugify(title)}-${jobId}`;
 
   const [loading, setLoading] = useState(false);
+  const [showSavedModal, setShowSavedModal] = useState(false);
 
+
+  // ============================
+  // 🔹 NORMALIZE SKILLS (SAFE)
+  // ============================
+  const normalizedSkills = useMemo(() => {
+    if (Array.isArray(skills)) return skills;
+
+    if (typeof skills === "string") {
+      // try JSON parse first
+      try {
+        const parsed = JSON.parse(skills);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        // fallback to comma split
+        return skills
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+      }
+    }
+
+    return [];
+  }, [skills]);
+
+  // ============================
   // 🔹 SAVE JOB
+  // ============================
   const handleSave = async (e) => {
+    e.stopPropagation();
+    if (loading) return;
+  
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+  
+      const res = await fetch(
+        `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      const data = await res.json();
+      if (!res.ok) throw new Error(data?.message || "Failed to save job");
+  
+      setShowSavedModal(true); // ✅ OPEN MODAL
+    } catch (err) {
+      console.error("❌ Save job error:", err);
+      alert(err.message || "Failed to save job");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
+  // ============================
+  // 🔹 UNSAVE JOB
+  // ============================
+  const handleUnsave = async (e) => {
     e.stopPropagation();
     if (loading) return;
 
@@ -51,7 +124,7 @@ export const JobCard = ({
       const res = await fetch(
         `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
         {
-          method: "POST",
+          method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -59,54 +132,49 @@ export const JobCard = ({
       );
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message);
 
-      alert("Job saved successfully");
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to unsave job");
+      }
+
+      setShowSavedModal(false);
+
+
+      // 🔥 remove from UI immediately
+      onUnsaveSuccess?.(jobId);
     } catch (err) {
-      alert(err.message || "Failed to save job");
+      console.error("❌ Unsave error:", err);
+      alert(err.message || "Failed to unsave job");
     } finally {
       setLoading(false);
     }
   };
 
-// 🔹 UNSAVE JOB (Saved Jobs page)
-const handleUnsave = async (e) => {
-  e.stopPropagation();
-  if (loading) return;
+  const normalizedLocation = useMemo(() => {
+    if (!location) return "";
 
-  try {
-    setLoading(true);
-    const token = localStorage.getItem("token");
-
-    const res = await fetch(
-      `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
-      {
-        method: "DELETE", // ✅ IMPORTANT
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data?.message || "Failed to unsave job");
+    // already an object
+    if (typeof location === "object") {
+      return `${location.city || ""}, ${location.state || ""}, ${
+        location.country || ""
+      }`;
     }
 
-    console.log("✅ Job unsaved successfully:", data);
-    alert("Job removed from saved");
+    // string JSON
+    if (typeof location === "string") {
+      try {
+        const parsed = JSON.parse(location);
+        return `${parsed.city || ""}, ${parsed.state || ""}, ${
+          parsed.country || ""
+        }`;
+      } catch {
+        // normal string fallback
+        return location;
+      }
+    }
 
-    // 🔥 remove from UI immediately
-    onUnsaveSuccess?.(jobId);
-  } catch (err) {
-    console.error("❌ Unsave error:", err);
-    alert(err.message || "Failed to unsave job");
-  } finally {
-    setLoading(false);
-  }
-};
-
+    return "";
+  }, [location]);
 
   return (
     <div
@@ -123,10 +191,26 @@ const handleUnsave = async (e) => {
           <span className="font-medium text-gray-700">
             {company || "Not Disclosed"}
           </span>
-          <FaStar className="text-yellow-500 text-xs" />
-          <span>{rating}</span>
-          <span className="text-gray-400">|</span>
-          <span>{reviews} Reviews</span>
+
+          {rating && (
+            <>
+              <FaStar className="text-yellow-500 text-xs" />
+              <span>{rating}</span>
+            </>
+          )}
+
+          {reviews && (
+            <>
+              <span className="text-gray-400">|</span>
+              <span>{reviews} Reviews</span>
+            </>
+          )}
+
+          {appliedBadge && (
+            <span className="ml-2 bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
+              Applied
+            </span>
+          )}
         </div>
 
         <div className="flex flex-wrap items-center gap-5 text-gray-700 text-sm mt-4">
@@ -134,22 +218,31 @@ const handleUnsave = async (e) => {
             <FaBriefcase /> {experience || "Not Disclosed"}
           </div>
           <div className="flex items-center gap-2">
-            <FaRupeeSign /> {salary || "Not Disclosed"}
+            <FaRupeeSign /> {salary ? `${salary} LPA` : "Not Disclosed"}
           </div>
+
           <div className="flex items-center gap-2">
-            <FaMapMarkerAlt /> {location || "Not Disclosed"}
+            <FaMapMarkerAlt /> {normalizedLocation || "Not Disclosed"}
           </div>
         </div>
 
-        <p className="text-gray-600 text-sm mt-3">
+        {/* <p className="text-gray-600 text-sm mt-3 line-clamp-2">
           {description || "Not Disclosed"}
-        </p>
+        </p> */}
 
-        <div className="flex flex-wrap gap-2 mt-3 text-sm text-indigo-700">
-          {skills.map((skill, i) => (
-            <span key={i}>{skill}</span>
-          ))}
-        </div>
+        {/* 🔹 SKILLS */}
+        {normalizedSkills.length > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3 text-sm">
+            {normalizedSkills.map((skill, i) => (
+              <span
+                key={i}
+                className="bg-indigo-50 text-indigo-700 px-2 py-1 rounded-md text-xs"
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        )}
 
         <p className="text-gray-400 text-xs mt-3">
           {posted || "Not Disclosed"}
@@ -162,7 +255,7 @@ const handleUnsave = async (e) => {
         onClick={(e) => e.stopPropagation()}
       >
         <img
-          src={logo}
+          src={logo || "/default-logo.png"}
           alt="Company Logo"
           className="w-12 h-12 rounded-xl object-cover border"
         />
@@ -172,13 +265,31 @@ const handleUnsave = async (e) => {
           onClick={isSaved ? handleUnsave : handleSave}
           disabled={loading}
           className={`flex items-center gap-2 mt-6 text-sm ${
-            loading ? "text-gray-400" : "text-gray-600 hover:text-gray-800"
+            loading
+              ? "text-gray-400 cursor-not-allowed"
+              : "text-gray-600 hover:text-gray-800"
           }`}
         >
           <FaBookmark className={isSaved ? "text-red-500" : ""} />
           {loading ? "Please wait..." : isSaved ? "Unsave" : "Save"}
         </button>
       </div>
+
+      <Dialog open={showSavedModal} onOpenChange={setShowSavedModal}>
+  <DialogContent className="sm:max-w-md">
+    <DialogHeader>
+      <DialogTitle>Job Saved 🎉</DialogTitle>
+      <DialogDescription>
+        This job has been successfully added to your saved jobs.
+      </DialogDescription>
+    </DialogHeader>
+
+    <DialogFooter className="mt-4">
+      <Button onClick={() => setShowSavedModal(false)}>Okay</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+
     </div>
   );
 };

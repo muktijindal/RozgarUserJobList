@@ -13,12 +13,6 @@ export const Navbar = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // 🚫 Hide navbar on auth pages
-  const hideNavbarRoutes = ["/login", "/signup", "/forgotpassword"];
-  if (hideNavbarRoutes.includes(pathname)) {
-    return null;
-  }
-
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -36,6 +30,12 @@ export const Navbar = () => {
     setIsDropdownOpen(false);
     router.push("/login"); // redirect after logout
   };
+
+  // 🚫 Hide navbar on auth pages
+  const hideNavbarRoutes = ["/login", "/signup", "/forgotpassword"];
+  if (hideNavbarRoutes.includes(pathname)) {
+    return null;
+  }
 
   return (
     <>
@@ -61,9 +61,15 @@ export const Navbar = () => {
 
         <nav className="px-4">
           <ul className="flex flex-col items-center space-y-6 mt-4">
-            <li><Link href="/userwebsite">Home</Link></li>
-            <li><Link href="/userwebsite/recommendedjobs">Jobs</Link></li>
-            <li><Link href="/profile">Profile</Link></li>
+            <li>
+              <Link href="/userwebsite">Home</Link>
+            </li>
+            <li>
+              <Link href="/userwebsite/recommendedjobs">Jobs</Link>
+            </li>
+            <li>
+              <Link href="/profile">Profile</Link>
+            </li>
 
             <li>
               <button

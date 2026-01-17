@@ -10,10 +10,10 @@ export const RecommendedHeader = ({ tabs, activeTab, setActiveTab }) => {
           Recommended jobs for you
         </h2>
         <div className="flex items-center gap-3">
-          <p className="text-sm text-gray-600">
+          {/* <p className="text-sm text-gray-600">
             You can select upto{" "}
             <span className="font-medium text-gray-900">5 jobs</span> to apply
-          </p>
+          </p> */}
           <button className="bg-indigo-200 hover:bg-indigo-300 text-indigo-900 font-semibold px-6 py-2 rounded-full transition">
             Apply
           </button>

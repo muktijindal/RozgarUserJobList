@@ -39,7 +39,7 @@ const Login = () => {
       if (!res.ok) {
         alert(data?.message || "Login failed");
       } else {
-        alert("Login Successful!");
+        // alert("Login Successful!");
 
         const token = data?.data?.token;
 

@@ -99,16 +99,16 @@ const AllJobList = ({ jobs, loading }) => {
           key={job.job_id}
           jobId={job.job_id}
           title={job.jobTitle || "NA"}
-          company={job.AboutCompany || "Company"}
+          company={job.postedBy || "Company"}
           experience={`${job.experinceFrom} - ${job.experinceTo} yrs`}
           salary={
             job.salaryRangeFrom && job.salaryRangeTo
               ? `${job.salaryRangeFrom} - ${job.salaryRangeTo}`
               : "Not disclosed"
           }
-          location={`${job.jobLocation?.city}, ${job.jobLocation?.state}, ${job.jobLocation?.country}`}
+          location={job.jobLocation}
           description={job.jobDescription || "No description available"}
-          skills={job.skills || []}
+          skills={job?.skills || []}
           posted={`Posted on ${new Date(job.created_at).toDateString()}`}
           logo="/default-logo.png"
         />
@@ -138,16 +138,16 @@ const AppliedJobList = ({ jobs, loading }) => {
             key={item.application_id}
             jobId={job.job_id}
             title={job.jobTitle || "NA"}
-            company={job.AboutCompany || item.name}
+            company={ item.name || "NA"}
             experience={`${job.experinceFrom} - ${job.experinceTo} yrs`}
             salary={
               job.salaryRangeFrom && job.salaryRangeTo
                 ? `${job.salaryRangeFrom} - ${job.salaryRangeTo}`
                 : "Not disclosed"
             }
-            location={`${job.jobLocation?.city}, ${job.jobLocation?.state}, ${job.jobLocation?.country}`}
+            location={job.jobLocation}
             description={job.jobDescription || "No description available"}
-            skills={job.skills || []}
+            skills={job?.skills || []}
             posted={`Applied on ${new Date(
               item.applied_at
             ).toDateString()}`}
@@ -174,16 +174,16 @@ const SavedJobList = ({ jobs, loading, setSavedJobs }) => {
           key={job.job_id}
           jobId={job.job_id}
           title={job.jobTitle || "NA"}
-          company={job.AboutCompany || "Company"}
+          company={job.postedBy || "Company"}
           experience={`${job.experinceFrom} - ${job.experinceTo} yrs`}
           salary={
             job.salaryRangeFrom && job.salaryRangeTo
               ? `${job.salaryRangeFrom} - ${job.salaryRangeTo}`
               : "Not disclosed"
           }
-          location={`${job.jobLocation?.city}, ${job.jobLocation?.state}, ${job.jobLocation?.country}`}
+          location={job.jobLocation}
           description={job.jobDescription || "No description available"}
-          skills={job.skills || []}
+          skills={job?.skills || []}
           posted={`Saved on ${new Date(job.created_at).toDateString()}`}
           logo="/default-logo.png"
 

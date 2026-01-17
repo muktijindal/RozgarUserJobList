@@ -27,6 +27,7 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
   const [profile, setProfile] = useState("");
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // 🔒 Lock background scroll
   useEffect(() => {
@@ -50,31 +51,69 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
       setProfile("");
       setNotice("");
       setError("");
+      setLoading(false);
     }
   }, [open]);
 
   if (!open) return null;
 
-  const handleSave = () => {
-    if (!company || !jobTitle || !salary || !notice) {
+  const handleSave = async () => {
+    setError("");
+
+    if (!company || !jobTitle || !joinYear || !joinMonth || !notice) {
       setError("Please fill all required fields.");
       return;
     }
 
-    onSave?.({
-      isCurrent,
-      employmentType,
-      experience: { years: expYears, months: expMonths },
-      company,
-      jobTitle,
-      joiningDate: { year: joinYear, month: joinMonth },
-      salary,
-      skills,
-      profile,
-      notice,
-    });
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("User not authenticated. Please login again.");
+      return;
+    }
 
-    setOpen(false);
+    // Build dates
+    const startDate = `${joinYear}-${String(joinMonth).padStart(2, "0")}-01`;
+
+    // If currently working → no end date
+    const endDate = isCurrent ? null : new Date().toISOString().split("T")[0];
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("http://147.93.72.227:5000/api/users/experiences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          company_name: company,
+          job_title: jobTitle,
+          start_date: startDate,
+          end_date: endDate,
+          currently_working: isCurrent,
+          description: profile || "",
+        }),
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data?.message || "Failed to save employment details.");
+        return;
+      }
+
+      // optional callback
+      onSave?.(data);
+
+      setOpen(false);
+    } catch (err) {
+      console.error("Experience save error:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -87,8 +126,7 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
 
       {/* Modal */}
       <div className="relative bg-white w-full max-w-3xl h-[85vh] rounded-2xl shadow-lg flex flex-col">
-        
-        {/* Header (Fixed) */}
+        {/* Header */}
         <div className="p-6 border-b relative">
           <button
             onClick={() => setOpen(false)}
@@ -99,13 +137,13 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
 
           <h2 className="text-xl font-semibold mb-1">Employment</h2>
           <p className="text-sm text-gray-500">
-            Details like job title, company name, etc, help employers understand your work
+            Details like job title, company name, etc, help employers understand
+            your work
           </p>
         </div>
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
-          
           {/* Current Employment */}
           <div>
             <p className="text-sm font-medium mb-2">
@@ -293,19 +331,21 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
 
-        {/* Footer (Fixed) */}
+        {/* Footer */}
         <div className="flex justify-end gap-4 p-6 border-t">
           <button
             onClick={() => setOpen(false)}
             className="text-blue-600 text-sm"
+            disabled={loading}
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700"
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700 disabled:bg-gray-400"
           >
-            Save
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

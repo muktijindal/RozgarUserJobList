@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "../../ui/card";
 import { Accomplisment } from "./Accomplisment";
 import ProfileSummaryModal from "../ProfileSummaryModal";
@@ -12,35 +12,114 @@ import HeadlineModal from "../HeadlineModal";
 import EmploymentModal from "../EmploymentModal";
 
 export default function ProfileSections() {
+  const [openSummary, setopenSummary] = useState(false);
+  const [openProjects, setopenProjects] = useState(false);
+  const [openITSkills, setopenITSkills] = useState(false);
+  const [openHeadline, setOpenHeadline] = useState(false);
+  const [openKeySkills, setOpenKeySkills] = useState(false);
+  const [openEducation, setOpenEducation] = useState(false);
+  const [openEmployment, setOpenEmployment] = useState(false);
+  const [experiences, setExperiences] = useState([]);
+  const [loadingExp, setLoadingExp] = useState(false);
+  const [educations, setEducations] = useState([]);
+  const [loadingEdu, setLoadingEdu] = useState(false);
+  const [skills, setSkills] = useState([]);
+  const [loadingSkills, setLoadingSkills] = useState(false);
 
-   const [openSummary, setopenSummary] = useState(false);
-    const [openProjects, setopenProjects] = useState(false);
-     const [openITSkills, setopenITSkills] = useState(false);
-     const [openHeadline, setOpenHeadline] = useState(false);
-const [openKeySkills, setOpenKeySkills] = useState(false);
-const [openEducation, setOpenEducation] = useState(false);
-const [openEmployment, setOpenEmployment] = useState(false);
+  const fetchEducations = async () => {
+    try {
+      setLoadingEdu(true);
+      const token = localStorage.getItem("token");
 
- 
+      const res = await fetch(
+        "http://147.93.72.227:5000/api/users/educations",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      // API may return array directly or wrapped
+      setEducations(data?.data || data || []);
+    } catch (err) {
+      console.error("Fetch educations error:", err);
+    } finally {
+      setLoadingEdu(false);
+    }
+  };
+
+  // ✅ Fetch experiences
+  const fetchExperiences = async () => {
+    try {
+      setLoadingExp(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        "http://147.93.72.227:5000/api/users/experiences",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: "include",
+        }
+      );
+
+      const data = await res.json();
+
+      // API usually returns array directly OR wrapped
+      setExperiences(data?.data || data || []);
+    } catch (err) {
+      console.error("Fetch experiences error:", err);
+    } finally {
+      setLoadingExp(false);
+    }
+  };
+  const fetchSkills = async () => {
+    try {
+      setLoadingSkills(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://147.93.72.227:5000/api/users/skills", {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: "include",
+      });
+
+      const data = await res.json();
+      setSkills(data?.data || data || []);
+    } catch (err) {
+      console.error("Fetch skills error:", err);
+    } finally {
+      setLoadingSkills(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchExperiences();
+    fetchEducations(); // ✅ ADD THIS
+    fetchSkills();
+  }, []);
+
   return (
     <div className="space-y-6">
-
       {/* Resume Headline */}
       <Card className="rounded-2xl shadow-sm bg-white p-0">
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
-              Resume headline 
+              Resume headline
               {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
             <button
-  onClick={() => setOpenHeadline(true)}
-  className="text-blue-600 text-sm"
->
-  Add resume headline
-</button>
-
+              onClick={() => setOpenHeadline(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add resume headline
+            </button>
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -55,16 +134,15 @@ const [openEmployment, setOpenEmployment] = useState(false);
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
               Key skills
-               {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
+              {/* <span className="text-green-600 text-sm font-medium">Add 8%</span> */}
             </h2>
 
             <button
-  onClick={() => setOpenKeySkills(true)}
-  className="text-blue-600 text-sm"
->
-  Add key skills
-</button>
-
+              onClick={() => setOpenKeySkills(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add key skills
+            </button>
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -80,103 +158,189 @@ const [openEmployment, setOpenEmployment] = useState(false);
             <h2 className="text-lg font-semibold">Employment</h2>
 
             <button
-  onClick={() => setOpenEmployment(true)}
-  className="text-blue-600 text-sm"
->
-  Add employment
-</button>
-
+              onClick={() => setOpenEmployment(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add employment
+            </button>
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
-            Your employment details will help recruiters understand your experience
+            Your employment details will help recruiters understand your
+            experience
           </p>
+
+          {/* EXPERIENCE LIST */}
+          <div className="mt-4 space-y-4">
+            {loadingExp && (
+              <p className="text-sm text-gray-400">
+                Loading employment details...
+              </p>
+            )}
+
+            {!loadingExp && experiences.length === 0 && (
+              <p className="text-sm text-gray-400">No employment added yet.</p>
+            )}
+
+            {experiences.map((exp) => (
+              <div
+                key={exp.id}
+                className="border rounded-xl p-4 flex justify-between items-start"
+              >
+                <div>
+                  <h3 className="font-medium">{exp.job_title}</h3>
+                  <p className="text-sm text-gray-600">{exp.company_name}</p>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formatDate(exp.start_date)} –{" "}
+                    {exp.currently_working
+                      ? "Present"
+                      : formatDate(exp.end_date)}
+                  </p>
+                </div>
+
+                <button className="text-blue-600 text-sm">Edit</button>
+              </div>
+            ))}
+          </div>
         </CardContent>
       </Card>
 
       {/* Education */}
+      {/* Education */}
       <Card className="rounded-2xl shadow-sm bg-white p-0">
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              Education 
-              {/* <span className="text-green-600 text-sm font-medium">Add 10%</span> */}
-            </h2>
+            <h2 className="text-lg font-semibold">Education</h2>
 
             <button
-  onClick={() => setOpenEducation(true)}
-  className="text-blue-600 text-sm"
->
-  Add education
-</button>
-
+              onClick={() => setOpenEducation(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add education
+            </button>
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
             Your qualifications help employers know your educational background
           </p>
 
-          {/* EDUCATION LEVEL LINKS */}
-          <div className="flex flex-col gap-2 mt-4">
-            <button className="text-blue-600 text-sm text-left">Add doctorate/PhD</button>
-            <button className="text-blue-600 text-sm text-left">Add masters/post-graduation</button>
-            <button className="text-blue-600 text-sm text-left">Add graduation/diploma</button>
-            <button className="text-blue-600 text-sm text-left">Add class XII</button>
-            <button className="text-blue-600 text-sm text-left">Add class X</button>
-            <button className="text-blue-600 text-sm text-left">Add below 10th</button>
+          {/* EDUCATION LIST */}
+          <div className="mt-4 space-y-4">
+            {loadingEdu && (
+              <p className="text-sm text-gray-400">
+                Loading education details...
+              </p>
+            )}
+
+            {!loadingEdu && educations.length === 0 && (
+              <p className="text-sm text-gray-400">No education added yet.</p>
+            )}
+
+            {educations.map((edu) => (
+              <div
+                key={edu.id}
+                className="border rounded-xl p-4 flex justify-between items-start"
+              >
+                <div>
+                  <h3 className="font-medium">
+                    {edu.degree}{" "}
+                    {edu.specialization && `(${edu.specialization})`}
+                  </h3>
+
+                  <p className="text-sm text-gray-600">{edu.institute_name}</p>
+
+                  <p className="text-xs text-gray-500 mt-1">
+                    {edu.start_year} – {edu.end_year || "Present"}
+                  </p>
+
+                  {edu.percentage && (
+                    <p className="text-xs text-gray-500">
+                      Score: {edu.percentage}
+                    </p>
+                  )}
+                </div>
+
+                <button className="text-blue-600 text-sm">Edit</button>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
 
       {/* IT Skills */}
-{/* IT Skills */}
-<Card className="rounded-2xl shadow-sm bg-white p-0">
-  <CardContent className="px-6 py-5">
-    <div className="flex justify-between items-center">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
-        IT skills
-      </h2>
+      {/* IT Skills */}
+      {/* IT Skills */}
+      <Card className="rounded-2xl shadow-sm bg-white p-0">
+        <CardContent className="px-6 py-5">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">IT skills</h2>
 
-      <button
-        onClick={() => setopenITSkills(true)}
-        className="text-blue-600 text-sm"
-      >
-        Add details
-      </button>
-    </div>
+            <button
+              onClick={() => setopenITSkills(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add details
+            </button>
+          </div>
 
-    <p className="text-sm text-gray-600 mt-2">
-      Show your technical expertise by mentioning softwares and skills you know
-    </p>
-  </CardContent>
-</Card>
+          <p className="text-sm text-gray-600 mt-2">
+            Show your technical expertise by mentioning softwares and skills you
+            know
+          </p>
 
+          {/* SKILLS LIST */}
+          <div className="mt-4 space-y-3">
+            {loadingSkills && (
+              <p className="text-sm text-gray-400">Loading skills...</p>
+            )}
 
-{/* Projects */}
-<Card className="rounded-2xl shadow-sm bg-white p-0">
-  <CardContent className="px-6 py-5">
-    <div className="flex justify-between items-center">
-      <h2 className="text-lg font-semibold flex items-center gap-2">
-        Projects
-      </h2>
+            {!loadingSkills && skills.length === 0 && (
+              <p className="text-sm text-gray-400">No skills added yet.</p>
+            )}
 
-      <button
-        onClick={() => setopenProjects(true)}
-        className="text-blue-600 text-sm"
-      >
-        Add project
-      </button>
-    </div>
+            <div className="flex flex-wrap gap-2">
+              {skills.map((skill) => (
+                <span
+                  key={skill.id}
+                  className="px-3 py-1 border rounded-full text-sm bg-gray-50"
+                >
+                  {skill.skill_name}
+                  <span className="text-gray-500 ml-1">
+                    ({skill.proficiency_level})
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-    <p className="text-sm text-gray-600 mt-2">
-      Stand out to employers by adding details about projects that you have done so far
-    </p>
-  </CardContent>
-</Card>
+      {/* Projects */}
+      <Card className="rounded-2xl shadow-sm bg-white p-0">
+        <CardContent className="px-6 py-5">
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              Projects
+            </h2>
 
+            <button
+              onClick={() => setopenProjects(true)}
+              className="text-blue-600 text-sm"
+            >
+              Add project
+            </button>
+          </div>
 
-{/* Profile Summary */}
-<Card className="rounded-2xl shadow-sm bg-white p-0">
+          <p className="text-sm text-gray-600 mt-2">
+            Stand out to employers by adding details about projects that you
+            have done so far
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Profile Summary */}
+      <Card className="rounded-2xl shadow-sm bg-white p-0">
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold">Profile summary</h2>
@@ -190,54 +354,63 @@ const [openEmployment, setOpenEmployment] = useState(false);
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
-            Highlight your key career achievements to help employers know your potential
+            Highlight your key career achievements to help employers know your
+            potential
           </p>
         </CardContent>
       </Card>
 
-<Accomplisment />
+      <Accomplisment />
 
+      <UserProjectsModal
+        open={openProjects}
+        setOpen={setopenProjects}
+        onSave={(data) => {
+          console.log("Project saved:", data);
+          // 🔹 API integration here
+        }}
+      />
 
+      <ProfileSummaryModal open={openSummary} setOpen={setopenSummary} />
 
-<UserProjectsModal
-open={openProjects} 
-setOpen={setopenProjects}
-  onSave={(data) => {
-    console.log("Project saved:", data);
-    // 🔹 API integration here
-  }}
-/>
+      <ITSkillsModal
+        open={openITSkills}
+        setOpen={setopenITSkills}
+        onSave={() => {
+          fetchSkills(); // 🔥 refresh skills list
+        }}
+      />
 
-    <ProfileSummaryModal open={openSummary} setOpen={setopenSummary} />
+      {/* Resume Headline */}
+      <HeadlineModal open={openHeadline} setOpen={setOpenHeadline} />
 
-<ITSkillsModal open={openITSkills} setOpen={setopenITSkills} />
+      {/* Key Skills */}
+      <KeySkillsModal open={openKeySkills} setOpen={setOpenKeySkills} />
 
-{/* Resume Headline */}
-<HeadlineModal
-  open={openHeadline}
-  setOpen={setOpenHeadline}
-/>
+      {/* Employment */}
+      <EmploymentModal
+        open={openEmployment}
+        setOpen={setOpenEmployment}
+        onSave={() => {
+          fetchExperiences(); // 🔥 refresh list
+        }}
+      />
 
-{/* Key Skills */}
-<KeySkillsModal
-  open={openKeySkills}
-  setOpen={setOpenKeySkills}
-/>
-
-{/* Employment */}
-<EmploymentModal
-  open={openEmployment}
-  setOpen={setOpenEmployment}
-/>
-
-{/* Education */}
-<EducationUserDetailsModal
-  open={openEducation}
-  setOpen={setOpenEducation}
-/>
-
-
-
+      <EducationUserDetailsModal
+        open={openEducation}
+        setOpen={setOpenEducation}
+        onSave={() => {
+          fetchEducations(); // 🔥 refresh education list
+        }}
+      />
     </div>
   );
 }
+
+const formatDate = (date) => {
+  if (!date) return "";
+  return new Date(date).toLocaleDateString("en-IN", {
+    month: "short",
+    year: "numeric",
+  });
+};
