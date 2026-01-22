@@ -25,6 +25,45 @@ export default function ProfileSections() {
   const [loadingEdu, setLoadingEdu] = useState(false);
   const [skills, setSkills] = useState([]);
   const [loadingSkills, setLoadingSkills] = useState(false);
+  const [projects, setProjects] = useState([]);
+const [loadingProjects, setLoadingProjects] = useState(false);
+const [editEducation, setEditEducation] = useState(null);
+const [editEmployment, setEditEmployment] = useState(null);
+
+
+
+
+const fetchProjects = async () => {
+  try {
+    setLoadingProjects(true);
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(
+      "http://147.93.72.227:5000/api/users/projects",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        credentials: "include",
+      }
+    );
+
+    const data = await res.json();
+    setProjects(data?.data || data || []);
+  } catch (err) {
+    console.error("Fetch projects error:", err);
+  } finally {
+    setLoadingProjects(false);
+  }
+};
+
+useEffect(() => {
+  fetchExperiences();
+  fetchEducations();
+  fetchSkills();
+  fetchProjects(); // ✅ ADD THIS
+}, []);
+
 
   const fetchEducations = async () => {
     try {
@@ -158,11 +197,17 @@ export default function ProfileSections() {
             <h2 className="text-lg font-semibold">Employment</h2>
 
             <button
-              onClick={() => setOpenEmployment(true)}
-              className="text-blue-600 text-sm"
-            >
-              Add employment
-            </button>
+  onClick={() => {
+    setEditEmployment(null); // ✅ ADD mode
+    setOpenEmployment(true);
+  }}
+  className="text-blue-600 text-sm"
+>
+  Add employment
+</button>
+
+
+
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
@@ -199,77 +244,95 @@ export default function ProfileSections() {
                   </p>
                 </div>
 
-                <button className="text-blue-600 text-sm">Edit</button>
+                <button
+  className="text-blue-600 text-sm"
+  onClick={() => {
+    setEditEmployment(exp); // ✅ EDIT mode
+    setOpenEmployment(true);
+  }}
+>
+  Edit
+</button>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
 
-      {/* Education */}
+    
       {/* Education */}
       <Card className="rounded-2xl shadow-sm bg-white p-0">
-        <CardContent className="px-6 py-5">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold">Education</h2>
+  <CardContent className="px-6 py-5">
+    <div className="flex justify-between items-center">
+      <h2 className="text-lg font-semibold">Education</h2>
 
-            <button
-              onClick={() => setOpenEducation(true)}
-              className="text-blue-600 text-sm"
-            >
-              Add education
-            </button>
-          </div>
+      <button
+        onClick={() => {
+          setEditEducation(null); // add mode
+          setOpenEducation(true);
+        }}
+        className="text-blue-600 text-sm"
+      >
+        Add education
+      </button>
+    </div>
 
-          <p className="text-sm text-gray-600 mt-2">
-            Your qualifications help employers know your educational background
-          </p>
+    <p className="text-sm text-gray-600 mt-2">
+      Your qualifications help employers know your educational background
+    </p>
 
-          {/* EDUCATION LIST */}
-          <div className="mt-4 space-y-4">
-            {loadingEdu && (
-              <p className="text-sm text-gray-400">
-                Loading education details...
+    {/* EDUCATION LIST */}
+    <div className="mt-4 space-y-4">
+      {loadingEdu && (
+        <p className="text-sm text-gray-400">
+          Loading education details...
+        </p>
+      )}
+
+      {!loadingEdu && educations.length === 0 && (
+        <p className="text-sm text-gray-400">No education added yet.</p>
+      )}
+
+      {educations.map((edu) => (
+        <div
+          key={edu.id}
+          className="border rounded-xl p-4 flex justify-between items-start"
+        >
+          <div>
+            <h3 className="font-medium">
+              {edu.degree}{" "}
+              {edu.specialization && `(${edu.specialization})`}
+            </h3>
+
+            <p className="text-sm text-gray-600">{edu.institute_name}</p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {edu.start_year} – {edu.end_year || "Present"}
+            </p>
+
+            {edu.percentage && (
+              <p className="text-xs text-gray-500">
+                Score: {edu.percentage}
               </p>
             )}
-
-            {!loadingEdu && educations.length === 0 && (
-              <p className="text-sm text-gray-400">No education added yet.</p>
-            )}
-
-            {educations.map((edu) => (
-              <div
-                key={edu.id}
-                className="border rounded-xl p-4 flex justify-between items-start"
-              >
-                <div>
-                  <h3 className="font-medium">
-                    {edu.degree}{" "}
-                    {edu.specialization && `(${edu.specialization})`}
-                  </h3>
-
-                  <p className="text-sm text-gray-600">{edu.institute_name}</p>
-
-                  <p className="text-xs text-gray-500 mt-1">
-                    {edu.start_year} – {edu.end_year || "Present"}
-                  </p>
-
-                  {edu.percentage && (
-                    <p className="text-xs text-gray-500">
-                      Score: {edu.percentage}
-                    </p>
-                  )}
-                </div>
-
-                <button className="text-blue-600 text-sm">Edit</button>
-              </div>
-            ))}
           </div>
-        </CardContent>
-      </Card>
 
-      {/* IT Skills */}
-      {/* IT Skills */}
+          <button
+            className="text-blue-600 text-sm"
+            onClick={() => {
+              setEditEducation(edu);
+              setOpenEducation(true);
+            }}
+          >
+            Edit
+          </button>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
+    
       {/* IT Skills */}
       <Card className="rounded-2xl shadow-sm bg-white p-0">
         <CardContent className="px-6 py-5">
@@ -316,28 +379,67 @@ export default function ProfileSections() {
         </CardContent>
       </Card>
 
-      {/* Projects */}
-      <Card className="rounded-2xl shadow-sm bg-white p-0">
-        <CardContent className="px-6 py-5">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              Projects
-            </h2>
+    
+    {/* Projects */}
+<Card className="rounded-2xl shadow-sm bg-white p-0">
+  <CardContent className="px-6 py-5">
+    <div className="flex justify-between items-center">
+      <h2 className="text-lg font-semibold">Projects</h2>
 
-            <button
-              onClick={() => setopenProjects(true)}
-              className="text-blue-600 text-sm"
-            >
-              Add project
-            </button>
+      <button
+        onClick={() => setopenProjects(true)}
+        className="text-blue-600 text-sm"
+      >
+        Add project
+      </button>
+    </div>
+
+    <p className="text-sm text-gray-600 mt-2">
+      Stand out to employers by adding details about projects you have done so far
+    </p>
+
+    {/* PROJECT LIST */}
+    <div className="mt-4 space-y-4">
+      {loadingProjects && (
+        <p className="text-sm text-gray-400">Loading projects...</p>
+      )}
+
+      {!loadingProjects && projects.length === 0 && (
+        <p className="text-sm text-gray-400">No projects added yet.</p>
+      )}
+
+      {projects.map((project) => (
+        <div
+          key={project.id}
+          className="border rounded-xl p-4 flex justify-between items-start"
+        >
+          <div>
+            <h3 className="font-medium">{project.project_title}</h3>
+
+            <p className="text-sm text-gray-600">
+              {project.client} • {project.project_status}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {project.work_from_month} {project.work_from_year}
+              {project.work_to_year &&
+                ` – ${project.work_to_month} ${project.work_to_year}`}
+            </p>
+
+            {project.project_details && (
+              <p className="text-sm text-gray-700 mt-2 line-clamp-3">
+                {project.project_details}
+              </p>
+            )}
           </div>
 
-          <p className="text-sm text-gray-600 mt-2">
-            Stand out to employers by adding details about projects that you
-            have done so far
-          </p>
-        </CardContent>
-      </Card>
+          <button className="text-blue-600 text-sm">Edit</button>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
 
       {/* Profile Summary */}
       <Card className="rounded-2xl shadow-sm bg-white p-0">
@@ -366,6 +468,7 @@ export default function ProfileSections() {
         open={openProjects}
         setOpen={setopenProjects}
         onSave={(data) => {
+          fetchProjects();
           console.log("Project saved:", data);
           // 🔹 API integration here
         }}
@@ -389,20 +492,26 @@ export default function ProfileSections() {
 
       {/* Employment */}
       <EmploymentModal
-        open={openEmployment}
-        setOpen={setOpenEmployment}
-        onSave={() => {
-          fetchExperiences(); // 🔥 refresh list
-        }}
-      />
+  open={openEmployment}
+  setOpen={setOpenEmployment}
+  employment={editEmployment}   // ✅ pass data for edit
+  onSave={() => {
+    fetchExperiences();         // 🔥 refresh list
+    setEditEmployment(null);
+  }}
+/>
 
-      <EducationUserDetailsModal
-        open={openEducation}
-        setOpen={setOpenEducation}
-        onSave={() => {
-          fetchEducations(); // 🔥 refresh education list
-        }}
-      />
+
+   <EducationUserDetailsModal
+  open={openEducation}
+  setOpen={setOpenEducation}
+  education={editEducation} // ✅ for edit
+  onSave={() => {
+    fetchEducations();
+    setEditEducation(null);
+  }}
+/>
+
     </div>
   );
 }

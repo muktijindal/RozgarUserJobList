@@ -8,10 +8,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function EducationUserDetailsModal({ open, setOpen }) {
+export default function EducationUserDetailsModal({
+  open,
+  setOpen,
+  education, // ✅ for edit + delete
+  onSave, // ✅ refresh list after delete/save
+}) {
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [message, setMessage] = useState("");
 
   const [formData, setFormData] = useState({
@@ -24,6 +30,39 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
     courseType: "Full time",
   });
 
+  /* ================= PREFILL FOR EDIT ================= */
+  useEffect(() => {
+    if (open && education) {
+      setFormData({
+        degree: education.degree || "",
+        specialization: education.specialization || "",
+        university: education.university || education.institute_name || "",
+        start_year: education.start_year || "",
+        end_year: education.end_year || "",
+        percentage: education.percentage || "",
+        courseType: education.courseType || "Full time",
+      });
+    }
+  }, [open, education]);
+
+  /* ================= RESET ON CLOSE ================= */
+  useEffect(() => {
+    if (!open) {
+      setFormData({
+        degree: "",
+        specialization: "",
+        university: "",
+        start_year: "",
+        end_year: "",
+        percentage: "",
+        courseType: "Full time",
+      });
+      setMessage("");
+      setLoading(false);
+      setDeleting(false);
+    }
+  }, [open]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -32,6 +71,7 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
     }));
   };
 
+  /* ================= SAVE (ADD / EDIT) ================= */
   const handleSubmit = async () => {
     setMessage("");
 
@@ -55,22 +95,29 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
     try {
       setLoading(true);
 
-      const res = await fetch("http://147.93.72.227:5000/api/users/educations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          degree: formData.degree,
-          specialization: formData.specialization,
-          university: formData.university,
-          start_year: Number(formData.start_year),
-          end_year: Number(formData.end_year),
-          percentage: formData.percentage,
-        }),
-        credentials: "include",
-      });
+      const isEdit = Boolean(education?.id);
+
+      const res = await fetch(
+        isEdit
+          ? `http://147.93.72.227:5000/api/users/educations/${education.id}`
+          : "http://147.93.72.227:5000/api/users/educations",
+        {
+          method: isEdit ? "PATCH" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            degree: formData.degree,
+            specialization: formData.specialization,
+            university: formData.university,
+            start_year: Number(formData.start_year),
+            end_year: Number(formData.end_year),
+            percentage: formData.percentage,
+          }),
+          credentials: "include",
+        }
+      );
 
       const data = await res.json();
 
@@ -79,16 +126,13 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
         return;
       }
 
-      setMessage("Education details saved successfully ✅");
-      setFormData({
-        degree: "",
-        specialization: "",
-        university: "",
-        start_year: "",
-        end_year: "",
-        percentage: "",
-        courseType: "Full time",
-      });
+      setMessage(
+        isEdit
+          ? "Education details updated successfully ✅"
+          : "Education details saved successfully ✅"
+      );
+
+      onSave?.();
 
       setTimeout(() => {
         setOpen(false);
@@ -99,6 +143,42 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
       setMessage("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  /* ================= DELETE EDUCATION ================= */
+  const handleDelete = async () => {
+    if (!education?.id) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      setDeleting(true);
+
+      const res = await fetch(
+        `http://147.93.72.227:5000/api/users/educations/delete/${education.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete education");
+      }
+
+      onSave?.();
+      setOpen(false);
+    } catch (error) {
+      console.error("Delete education error:", error);
+      setMessage("Failed to delete education.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -118,7 +198,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
 
         {/* FORM */}
         <div className="space-y-6">
-          {/* Degree */}
           <div>
             <label className="text-sm font-medium">Education *</label>
             <input
@@ -130,7 +209,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
             />
           </div>
 
-          {/* University */}
           <div>
             <label className="text-sm font-medium">University/Institute *</label>
             <input
@@ -142,7 +220,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
             />
           </div>
 
-          {/* Specialization */}
           <div>
             <label className="text-sm font-medium">Specialization *</label>
             <input
@@ -154,26 +231,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
             />
           </div>
 
-          {/* Course Type */}
-          <div>
-            <label className="text-sm font-medium">Course type *</label>
-            <div className="flex items-center gap-10 mt-3 text-sm">
-              {["Full time", "Part time", "Distance"].map((type) => (
-                <label key={type} className="flex items-center gap-2">
-                  <input
-                    type="radio"
-                    name="courseType"
-                    value={type}
-                    checked={formData.courseType === type}
-                    onChange={handleChange}
-                  />
-                  {type}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Duration */}
           <div>
             <label className="text-sm font-medium">Course duration *</label>
             <div className="flex items-center gap-4 mt-2">
@@ -185,9 +242,7 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
                 className="w-full border rounded-xl p-3 text-sm outline-none"
                 placeholder="Start year"
               />
-
               <span className="text-gray-500">To</span>
-
               <input
                 type="number"
                 name="end_year"
@@ -199,7 +254,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
             </div>
           </div>
 
-          {/* Percentage */}
           <div>
             <label className="text-sm font-medium">Percentage / CGPA</label>
             <input
@@ -211,7 +265,6 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
             />
           </div>
 
-          {/* Message */}
           {message && (
             <p
               className={`text-sm ${
@@ -226,18 +279,30 @@ export default function EducationUserDetailsModal({ open, setOpen }) {
         </div>
 
         {/* FOOTER */}
-        <DialogFooter className="mt-8">
-          <Button variant="outline" onClick={() => setOpen(false)} className="px-6">
-            Cancel
-          </Button>
+        <DialogFooter className="mt-8 flex justify-between">
+          {education && (
+            <Button
+              variant="outline"
+              onClick={handleDelete}
+              disabled={deleting}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          )}
 
-          <Button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-8 bg-blue-600 text-white hover:bg-blue-700"
-          >
-            {loading ? "Saving..." : "Save"}
-          </Button>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="bg-blue-600 text-white hover:bg-blue-700"
+            >
+              {loading ? "Saving..." : education ? "Update" : "Save"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

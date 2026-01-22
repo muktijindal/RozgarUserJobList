@@ -3,13 +3,20 @@
 import React, { useEffect, useState } from "react";
 
 const months = [
-  "Jan","Feb","Mar","Apr","May","Jun",
-  "Jul","Aug","Sep","Oct","Nov","Dec"
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December"
 ];
 
-const years = Array.from({ length: 40 }, (_, i) => 2025 - i);
+const years = Array.from({ length: 40 }, (_, i) => 2026 - i);
 
-export default function CertificationModal({ open, onClose, onSave }) {
+export default function CertificationModal({
+  open,
+  onClose,
+  onSave,
+  certification = null, // 👈 NEW (null = add, object = edit)
+}) {
+  const isEdit = Boolean(certification);
+
   const [name, setName] = useState("");
   const [completionId, setCompletionId] = useState("");
   const [url, setUrl] = useState("");
@@ -19,8 +26,21 @@ export default function CertificationModal({ open, onClose, onSave }) {
   const [toYear, setToYear] = useState("");
   const [noExpiry, setNoExpiry] = useState(false);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  /* ================= PREFILL (EDIT MODE) ================= */
   useEffect(() => {
+    if (open && certification) {
+      setName(certification.certification_name || "");
+      setCompletionId(certification.certification_completion_id || "");
+      setUrl(certification.certification_url || "");
+      setFromMonth(certification.validity_from_month || "");
+      setFromYear(certification.validity_from_year || "");
+      setToMonth(certification.validity_to_month || "");
+      setToYear(certification.validity_to_year || "");
+      setNoExpiry(certification.certificate_does_not_expire || false);
+    }
+
     if (!open) {
       setName("");
       setCompletionId("");
@@ -31,40 +51,68 @@ export default function CertificationModal({ open, onClose, onSave }) {
       setToYear("");
       setNoExpiry(false);
       setError("");
+      setLoading(false);
     }
-  }, [open]);
+  }, [open, certification]);
 
   if (!open) return null;
 
-  const handleSave = () => {
+  /* ================= SAVE ================= */
+  const handleSave = async () => {
     if (!name.trim()) {
       setError("Certification name is required.");
       return;
     }
 
-    onSave?.({
-      name,
-      completionId,
-      url,
-      validity: noExpiry
-        ? "Does not expire"
-        : {
-            from: { month: fromMonth, year: fromYear },
-            to: { month: toMonth, year: toYear },
-          },
-    });
+    try {
+      setLoading(true);
+      setError("");
 
-    onClose();
+      const token = localStorage.getItem("token");
+
+      const payload = {
+        certification_name: name,
+        certification_completion_id: completionId || null,
+        certification_url: url || null,
+        validity_from_month: fromMonth || null,
+        validity_from_year: fromYear || null,
+        validity_to_month: noExpiry ? null : toMonth,
+        validity_to_year: noExpiry ? null : toYear,
+        certificate_does_not_expire: noExpiry,
+      };
+
+      const apiUrl = isEdit
+        ? `http://147.93.72.227:5000/api/users/certifications/${certification.id}`
+        : "http://147.93.72.227:5000/api/users/certifications";
+
+      const method = isEdit ? "PUT" : "POST";
+
+      const res = await fetch(apiUrl, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error("Failed to save certification");
+
+      onSave?.();
+      onClose();
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  /* ================= UI (UNCHANGED) ================= */
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
-      {/* Modal */}
       <div className="relative bg-white w-full max-w-xl rounded-2xl shadow-lg p-6">
-        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-xl"
@@ -78,7 +126,6 @@ export default function CertificationModal({ open, onClose, onSave }) {
         </p>
 
         <div className="space-y-4">
-          {/* Certification name */}
           <div>
             <label className="text-sm font-medium">
               Certification name <span className="text-red-500">*</span>
@@ -86,12 +133,10 @@ export default function CertificationModal({ open, onClose, onSave }) {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Please enter your certification name"
-              className="mt-1 w-full rounded-lg border px-4 py-2 outline-none focus:ring-2 focus:ring-blue-500"
+              className="mt-1 w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          {/* Completion ID */}
           <div>
             <label className="text-sm font-medium">
               Certification completion ID
@@ -99,26 +144,25 @@ export default function CertificationModal({ open, onClose, onSave }) {
             <input
               value={completionId}
               onChange={(e) => setCompletionId(e.target.value)}
-              placeholder="Please mention your course completion ID"
-              className="mt-1 w-full rounded-lg border px-4 py-2 outline-none"
+              className="mt-1 w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          {/* URL */}
           <div>
             <label className="text-sm font-medium">Certification URL</label>
             <input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="Please mention your completion URL"
-              className="mt-1 w-full rounded-lg border px-4 py-2 outline-none"
+              className="mt-1 w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          {/* Validity */}
           <div>
-            <label className="text-sm font-medium">Certification validity</label>
-            <div className="flex items-center gap-3 mt-2">
+            <label className="text-sm font-medium">
+              Certification validity
+            </label>
+
+            <div className="flex gap-3 mt-2">
               <select
                 value={fromMonth}
                 onChange={(e) => setFromMonth(e.target.value)}
@@ -141,7 +185,7 @@ export default function CertificationModal({ open, onClose, onSave }) {
                 ))}
               </select>
 
-              <span className="text-sm text-gray-500">To</span>
+              <span className="text-sm text-gray-500 self-center">To</span>
 
               <select
                 value={toMonth}
@@ -169,8 +213,7 @@ export default function CertificationModal({ open, onClose, onSave }) {
             </div>
           </div>
 
-          {/* No expiry */}
-          <label className="flex items-center gap-2 text-sm mt-2">
+          <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={noExpiry}
@@ -182,18 +225,21 @@ export default function CertificationModal({ open, onClose, onSave }) {
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
 
-        {/* Footer */}
+        {/* replace only button handler */}
         <div className="flex justify-end gap-4 mt-6">
           <button onClick={onClose} className="text-blue-600 text-sm">
             Cancel
           </button>
           <button
             onClick={handleSave}
-            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700"
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm disabled:opacity-60"
           >
-            Save
+            {loading ? "Saving..." : "Save"}
           </button>
         </div>
+
+        {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
       </div>
     </div>
   );

@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-
-
 const slugify = (text) =>
   (text ?? "job")
     .toLowerCase()
@@ -52,7 +50,6 @@ export const JobCard = ({
   const [loading, setLoading] = useState(false);
   const [showSavedModal, setShowSavedModal] = useState(false);
 
-
   // ============================
   // 🔹 NORMALIZE SKILLS (SAFE)
   // ============================
@@ -82,11 +79,11 @@ export const JobCard = ({
   const handleSave = async (e) => {
     e.stopPropagation();
     if (loading) return;
-  
+
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
-  
+
       const res = await fetch(
         `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
         {
@@ -96,10 +93,10 @@ export const JobCard = ({
           },
         }
       );
-  
+
       const data = await res.json();
       if (!res.ok) throw new Error(data?.message || "Failed to save job");
-  
+
       setShowSavedModal(true); // ✅ OPEN MODAL
     } catch (err) {
       console.error("❌ Save job error:", err);
@@ -108,7 +105,6 @@ export const JobCard = ({
       setLoading(false);
     }
   };
-  
 
   // ============================
   // 🔹 UNSAVE JOB
@@ -138,7 +134,6 @@ export const JobCard = ({
       }
 
       setShowSavedModal(false);
-
 
       // 🔥 remove from UI immediately
       onUnsaveSuccess?.(jobId);
@@ -276,20 +271,19 @@ export const JobCard = ({
       </div>
 
       <Dialog open={showSavedModal} onOpenChange={setShowSavedModal}>
-  <DialogContent className="sm:max-w-md">
-    <DialogHeader>
-      <DialogTitle>Job Saved 🎉</DialogTitle>
-      <DialogDescription>
-        This job has been successfully added to your saved jobs.
-      </DialogDescription>
-    </DialogHeader>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Job Saved 🎉</DialogTitle>
+            <DialogDescription>
+              This job has been successfully added to your saved jobs.
+            </DialogDescription>
+          </DialogHeader>
 
-    <DialogFooter className="mt-4">
-      <Button onClick={() => setShowSavedModal(false)}>Okay</Button>
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-
+          <DialogFooter className="mt-4">
+            <Button onClick={() => setShowSavedModal(false)}>Okay</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

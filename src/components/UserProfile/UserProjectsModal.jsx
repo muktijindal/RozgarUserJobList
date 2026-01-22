@@ -9,124 +9,213 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { toast } from "react-toastify";
+
+const emptyProject = {
+  project_title: "",
+  client: "",
+  project_status: "",
+  work_from_year: "",
+  work_from_month: "",
+  work_to_year: "",
+  work_to_month: "",
+  project_details: "",
+};
 
 export default function UserProjectsModal({ open, setOpen }) {
-  const [details, setDetails] = useState("");
   const maxChars = 1000;
+
+  const [projects, setProjects] = useState([emptyProject]);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (index, e) => {
+    const { name, value } = e.target;
+    const updated = [...projects];
+    updated[index][name] = value;
+    setProjects(updated);
+  };
+
+  const addMoreProject = () => {
+    setProjects((prev) => [...prev, emptyProject]);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      for (const project of projects) {
+        if (!project.project_title || !project.project_status) continue;
+
+        const res = await fetch("http://147.93.72.227:5000/api/users/projects", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(project),
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to save project");
+        }
+      }
+
+      toast.success("Projects added successfully");
+      setOpen(false);
+      setProjects([emptyProject]);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="max-w-3xl h-190 overflow-scroll rounded-2xl p-8">
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto rounded-2xl p-8">
         <DialogHeader>
-          <DialogTitle className="text-xl">Project</DialogTitle>
+          <DialogTitle className="text-xl">Projects</DialogTitle>
         </DialogHeader>
 
-        {/* Description */}
-        <p className="text-gray-600 text-sm leading-relaxed -mt-2 mb-4">
-          Stand out for employers by adding details about projects you have done
-          in college, internships, or at work
+        <p className="text-gray-600 text-sm mb-4">
+          Add projects from college, internships, or work experience.
         </p>
 
-        {/* FORM FIELDS */}
-        <div className="space-y-6">
-          {/* Project title */}
-          <div>
-            <label className="text-sm font-medium">Project title</label>
-            <input
-              type="text"
-              placeholder="Enter project title"
-              className="w-full border rounded-xl p-3 mt-2 outline-none text-sm"
-            />
-          </div>
+        <div className="space-y-8">
+          {projects.map((project, index) => (
+            <div
+              key={index}
+              className="border rounded-xl p-6 space-y-6 bg-gray-50"
+            >
+              <h3 className="text-sm font-semibold text-gray-700">
+                Project {index + 1}
+              </h3>
 
-          {/* Client */}
-          <div>
-            <label className="text-sm font-medium">Client</label>
-            <input
-              type="text"
-              placeholder="Enter client name"
-              className="w-full border rounded-xl p-3 mt-2 outline-none text-sm"
-            />
-          </div>
+              {/* Project title */}
+              <div>
+                <label className="text-sm font-medium">Project title</label>
+                <input
+                  name="project_title"
+                  value={project.project_title}
+                  onChange={(e) => handleChange(index, e)}
+                  className="w-full border rounded-xl p-3 mt-2 text-sm"
+                  placeholder="Enter project title"
+                />
+              </div>
 
-          {/* Project Status */}
-          <div>
-            <label className="text-sm font-medium">Project status</label>
-            <select className="w-full border rounded-xl p-3 mt-2 outline-none text-sm">
-              <option>Select status</option>
-              <option>Completed</option>
-              <option>In Progress</option>
-              <option>On Hold</option>
-            </select>
-          </div>
+              {/* Client */}
+              <div>
+                <label className="text-sm font-medium">Client</label>
+                <input
+                  name="client"
+                  value={project.client}
+                  onChange={(e) => handleChange(index, e)}
+                  className="w-full border rounded-xl p-3 mt-2 text-sm"
+                  placeholder="Enter client name"
+                />
+              </div>
 
-          {/* Worked From */}
-          <div>
-            <label className="text-sm font-medium">Worked from</label>
+              {/* Status */}
+              <div>
+                <label className="text-sm font-medium">Project status</label>
+                <select
+                  name="project_status"
+                  value={project.project_status}
+                  onChange={(e) => handleChange(index, e)}
+                  className="w-full border rounded-xl p-3 mt-2 text-sm"
+                >
+                  <option value="">Select status</option>
+                  <option>Completed</option>
+                  <option>In Progress</option>
+                  <option>On Hold</option>
+                </select>
+              </div>
 
-            <div className="flex gap-4 mt-2">
-              {/* Year */}
-              <select className="w-full border rounded-xl p-3 outline-none text-sm">
-                <option>Select year</option>
-                {[...Array(25)].map((_, i) => (
-                  <option key={i}>{2024 - i}</option>
-                ))}
-              </select>
+              {/* Worked From */}
+              <div>
+                <label className="text-sm font-medium">Worked from</label>
+                <div className="flex gap-4 mt-2">
+                  <select
+                    name="work_from_year"
+                    value={project.work_from_year}
+                    onChange={(e) => handleChange(index, e)}
+                    className="w-full border rounded-xl p-3 text-sm"
+                  >
+                    <option value="">Year</option>
+                    {[...Array(25)].map((_, i) => (
+                      <option key={i}>{2024 - i}</option>
+                    ))}
+                  </select>
 
-              {/* Month */}
-              <select className="w-full border rounded-xl p-3 outline-none text-sm">
-                <option>Select month</option>
-                {[
-                  "January",
-                  "February",
-                  "March",
-                  "April",
-                  "May",
-                  "June",
-                  "July",
-                  "August",
-                  "September",
-                  "October",
-                  "November",
-                  "December",
-                ].map((m) => (
-                  <option key={m}>{m}</option>
-                ))}
-              </select>
+                  <select
+                    name="work_from_month"
+                    value={project.work_from_month}
+                    onChange={(e) => handleChange(index, e)}
+                    className="w-full border rounded-xl p-3 text-sm"
+                  >
+                    <option value="">Month</option>
+                    {[
+                      "January",
+                      "February",
+                      "March",
+                      "April",
+                      "May",
+                      "June",
+                      "July",
+                      "August",
+                      "September",
+                      "October",
+                      "November",
+                      "December",
+                    ].map((m) => (
+                      <option key={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div>
+                <label className="text-sm font-medium">
+                  Details of project
+                </label>
+                <textarea
+                  name="project_details"
+                  value={project.project_details}
+                  maxLength={maxChars}
+                  onChange={(e) => handleChange(index, e)}
+                  rows={4}
+                  className="w-full border rounded-xl p-4 mt-2 text-sm resize-none"
+                  placeholder="Describe your project..."
+                />
+                <div className="text-right text-xs text-gray-500 mt-1">
+                  {maxChars - project.project_details.length} characters left
+                </div>
+              </div>
             </div>
-          </div>
+          ))}
 
-          {/* Details */}
-          <div>
-            <label className="text-sm font-medium">Details of project</label>
-
-            <textarea
-              rows={5}
-              value={details}
-              maxLength={maxChars}
-              onChange={(e) => setDetails(e.target.value)}
-              placeholder="Type here..."
-              className="w-full border rounded-xl p-4 mt-2 outline-none text-sm resize-none"
-            />
-
-            <div className="text-right text-xs text-gray-500 mt-1">
-              {maxChars - details.length} character(s) left
-            </div>
-          </div>
-
-          {/* Add more details */}
-          <button className="text-blue-600 text-sm font-medium hover:underline">
-            Add more details
+          {/* Add More */}
+          <button
+            onClick={addMoreProject}
+            className="text-blue-600 text-sm font-medium hover:underline"
+          >
+            + Add more details
           </button>
         </div>
 
-        {/* FOOTER BUTTONS */}
         <DialogFooter className="mt-6">
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-
-          <Button className="px-8 bg-blue-600 text-white">Save</Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-8 bg-blue-600 text-white"
+          >
+            {loading ? "Saving..." : "Save"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

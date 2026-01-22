@@ -13,7 +13,12 @@ const noticePeriods = [
   "More than 3 Months",
 ];
 
-export default function EmploymentModal({ open, setOpen, onSave }) {
+export default function EmploymentModal({
+  open,
+  setOpen,
+  onSave,
+  employment, // edit object
+}) {
   const [isCurrent, setIsCurrent] = useState(true);
   const [employmentType, setEmploymentType] = useState("Full-time");
   const [expYears, setExpYears] = useState("");
@@ -29,13 +34,40 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // 🔒 Lock background scroll
+  /* 🔒 Lock background scroll */
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
   }, [open]);
 
-  // Reset form when modal closes
+  /* ================= PREFILL ALL FIELDS FOR EDIT ================= */
+  useEffect(() => {
+    if (open && employment) {
+      setCompany(employment.company_name || "");
+      setJobTitle(employment.job_title || "");
+      setIsCurrent(employment.currently_working ?? true);
+      setProfile(employment.description || "");
+
+      setEmploymentType(employment.employment_type || "Full-time");
+      setSalary(employment.salary || "");
+      setSkills(employment.skills || "");
+      setNotice(employment.notice_period || "");
+
+      if (employment.total_experience_years)
+        setExpYears(employment.total_experience_years);
+
+      if (employment.total_experience_months)
+        setExpMonths(employment.total_experience_months);
+
+      if (employment.start_date) {
+        const d = new Date(employment.start_date);
+        setJoinYear(d.getFullYear());
+        setJoinMonth(d.getMonth() + 1);
+      }
+    }
+  }, [open, employment]);
+
+  /* ================= RESET ON CLOSE ================= */
   useEffect(() => {
     if (!open) {
       setIsCurrent(true);
@@ -71,17 +103,22 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
       return;
     }
 
-    // Build dates
     const startDate = `${joinYear}-${String(joinMonth).padStart(2, "0")}-01`;
-
-    // If currently working → no end date
     const endDate = isCurrent ? null : new Date().toISOString().split("T")[0];
 
     try {
       setLoading(true);
 
-      const res = await fetch("http://147.93.72.227:5000/api/users/experiences", {
-        method: "POST",
+      const isEdit = Boolean(employment?.id);
+
+      const url = isEdit
+        ? `http://147.93.72.227:5000/api/users/experience/update/${employment.id}`
+        : "http://147.93.72.227:5000/api/users/experiences";
+
+      const method = isEdit ? "PATCH" : "POST";
+
+      const res = await fetch(url, {
+        method,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -92,7 +129,13 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
           start_date: startDate,
           end_date: endDate,
           currently_working: isCurrent,
-          description: profile || "",
+          description: profile,
+          employment_type: employmentType,
+          total_experience_years: expYears,
+          total_experience_months: expMonths,
+          salary,
+          skills,
+          notice_period: notice,
         }),
         credentials: "include",
       });
@@ -104,9 +147,7 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
         return;
       }
 
-      // optional callback
-      onSave?.(data);
-
+      onSave?.();
       setOpen(false);
     } catch (err) {
       console.error("Experience save error:", err);
@@ -118,15 +159,14 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/40"
         onClick={() => setOpen(false)}
       />
 
-      {/* Modal */}
+      
       <div className="relative bg-white w-full max-w-3xl h-[85vh] rounded-2xl shadow-lg flex flex-col">
-        {/* Header */}
+        {/* HEADER */}
         <div className="p-6 border-b relative">
           <button
             onClick={() => setOpen(false)}
@@ -142,7 +182,6 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
           </p>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-5">
           {/* Current Employment */}
           <div>
@@ -331,7 +370,7 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
           {error && <p className="text-sm text-red-500">{error}</p>}
         </div>
 
-        {/* Footer */}
+        {/* FOOTER */}
         <div className="flex justify-end gap-4 p-6 border-t">
           <button
             onClick={() => setOpen(false)}
@@ -345,10 +384,28 @@ export default function EmploymentModal({ open, setOpen, onSave }) {
             disabled={loading}
             className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {loading ? "Saving..." : "Save"}
+            {loading ? "Saving..." : employment ? "Update" : "Save"}
           </button>
         </div>
       </div>
-    </div>
+
+        {/* <div className="flex justify-end gap-4 p-6 border-t">
+          <button
+            onClick={() => setOpen(false)}
+            className="text-blue-600 text-sm"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={loading}
+            className="bg-blue-600 text-white px-6 py-2 rounded-full text-sm hover:bg-blue-700 disabled:bg-gray-400"
+          >
+            {loading ? "Saving..." : employment ? "Update" : "Save"}
+          </button>
+        </div> */}
+      </div>
+  
   );
 }
