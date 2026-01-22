@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "../ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
 import { FaEdit } from "react-icons/fa";
@@ -11,39 +11,118 @@ import Link from "next/link";
 
 export const UserDetails = () => {
   const [open, setOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const fileInputRef = useRef(null);
+
+  useEffect(() => {
+    fetchUserBasic();
+  }, []);
+
+  const fetchUserBasic = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        "http://147.93.72.227:5000/api/users/basic",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch user");
+
+      const data = await res.json();
+      setUser(data?.data || data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (file) => {
+    try {
+      const token = localStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      await fetch(
+        "http://147.93.72.227:5000/api/users/profile/update/basic",
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      fetchUserBasic();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const onFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) handleImageUpload(file);
+  };
+
+  if (loading) return null;
+
+  const profileImg = user?.profile_image_url || "";
+
+  const initials =
+    user?.full_name
+      ?.split(" ")
+      .map((n) => n[0])
+      .join("")
+      .slice(0, 2) || "U";
+
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString() : "—";
 
   return (
     <>
-      {/* MODAL */}
       <EditBasicDetailsModal open={open} setOpen={setOpen} />
 
-      {/* PROFILE CARD */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        hidden
+        onChange={onFileChange}
+      />
+
       <div className="lg:col-span-12 pb-5">
         <Card className="rounded-2xl p-6 shadow-md">
-          <div className="flex flex-col lg:flex-row gap-6 items-center lg:items-start">
-            {/* Left Profile */}
-            <div className="flex items-center gap-6 w-full lg:w-auto">
-              {/* <div className="relative">
-                <Avatar className="w-28 h-28">
-                  <AvatarImage src="/avatar-placeholder.png" alt="avatar" />
-                  <AvatarFallback>R</AvatarFallback>
+          <div className="flex flex-col lg:flex-row gap-6 items-start">
+            {/* LEFT */}
+            <div className="flex gap-6 w-full">
+              <div
+                className="cursor-pointer"
+                onClick={() => fileInputRef.current.click()}
+              >
+                <Avatar>
+                  <AvatarImage
+                    src={profileImg}
+                    alt="avatar"
+                    className="w-28 h-28"
+                  />
+                  <AvatarFallback className="text-xl font-semibold">
+                    {initials}
+                  </AvatarFallback>
                 </Avatar>
+              </div>
 
-                <div className="absolute -right-2 bottom-0 w-14 h-14 rounded-full bg-white flex items-center justify-center shadow">
-                  <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center">
-                    <div className="text-sm text-red-500 font-semibold">
-                      18%
-                    </div>
-                  </div>
-                </div>
-              </div> */}
-
-              {/* Info */}
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-2xl font-semibold">Rishab</h3>
-
-                  {/* EDIT BUTTON */}
+                  <h3 className="text-2xl font-semibold">
+                    {user?.full_name}
+                  </h3>
                   <button
                     className="text-lg text-gray-400"
                     onClick={() => setOpen(true)}
@@ -52,53 +131,59 @@ export const UserDetails = () => {
                   </button>
                 </div>
 
-                <p className="text-sm text-gray-500 mt-1">
-                  Profile last updated -{" "}
-                  <span className="font-medium">Today</span>
-                </p>
-
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-3">
-                    <span>📍</span> New Delhi, INDIA
+                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
+                  <div>📧 Email: {user?.email || "—"}</div>
+                  <div>📱 Phone: {user?.phone || "—"}</div>
+                  <div>
+                    📍 Location: {user?.current_location},{" "}
+                    {user?.current_location_country}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span>👤</span> Fresher
+                  <div>
+                    👤 Work Status:{" "}
+                    {user?.work_status === "fresher"
+                      ? "Fresher"
+                      : "Experienced"}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span>📅</span> Add availability to join
+                  <div>
+                    🧠 Experience: {user?.total_experience_years} yrs{" "}
+                    {user?.total_experience_months} mos
+                  </div>
+                  <div>
+                    📅 Availability:{" "}
+                    {user?.availability_to_join || "—"}
+                  </div>
+                  <div>
+                    🛑 Last Working Day:{" "}
+                    {formatDate(user?.Expected_last_working_day)}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Right side improvement card */}
+            {/* RIGHT CARD */}
             <div className="ml-auto w-full sm:w-80">
               <div className="bg-amber-50 p-5 rounded-xl">
                 <div className="flex flex-col gap-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      Verify mobile number
-                    </span>
-                    <Badge className="bg-green-100 text-green-700">+10%</Badge>
+                  <div className="flex justify-between">
+                    <span>Verify mobile number</span>
+                    <Badge className="bg-green-100 text-green-700">
+                      +10%
+                    </Badge>
                   </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Verify email</span>
-                    <Badge className="bg-green-100 text-green-700">+5%</Badge>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">
-                      Add preferred location
-                    </span>
-                    <Badge className="bg-green-100 text-green-700">+2%</Badge>
+                  <div className="flex justify-between">
+                    <span>Verify email</span>
+                    <Badge className="bg-green-100 text-green-700">
+                      +5%
+                    </Badge>
                   </div>
 
                   <Button
                     asChild
-                    className="mt-4 w-full bg-rose-500 text-white hover:bg-rose-600"
+                    className="mt-4 w-full bg-rose-500 text-white"
                   >
-                    <Link href="/pending-action">Add 13 missing details</Link>
+                    <Link href="/pending-action">
+                      Complete your profile
+                    </Link>
                   </Button>
                 </div>
               </div>

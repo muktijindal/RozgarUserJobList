@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "react-toastify";
 
 const emptyProject = {
+  id: null,
   project_title: "",
   client: "",
   project_status: "",
@@ -22,11 +23,32 @@ const emptyProject = {
   project_details: "",
 };
 
-export default function UserProjectsModal({ open, setOpen }) {
+export default function UserProjectsModal({
+  open,
+  setOpen,
+  project, // ✅ edit support
+  onClose,
+  onSave,
+}) {
   const maxChars = 1000;
 
   const [projects, setProjects] = useState([emptyProject]);
   const [loading, setLoading] = useState(false);
+
+  /* ================= PREFILL FOR EDIT ================= */
+  useEffect(() => {
+    if (open && project) {
+      setProjects([{ ...emptyProject, ...project }]);
+    }
+  }, [open, project]);
+
+  /* ================= RESET ON CLOSE ================= */
+  useEffect(() => {
+    if (!open) {
+      setProjects([emptyProject]);
+      onClose?.();
+    }
+  }, [open]);
 
   const handleChange = (index, e) => {
     const { name, value } = e.target;
@@ -39,6 +61,7 @@ export default function UserProjectsModal({ open, setOpen }) {
     setProjects((prev) => [...prev, emptyProject]);
   };
 
+  /* ================= SAVE / UPDATE ================= */
   const handleSubmit = async () => {
     try {
       setLoading(true);
@@ -47,23 +70,67 @@ export default function UserProjectsModal({ open, setOpen }) {
       for (const project of projects) {
         if (!project.project_title || !project.project_status) continue;
 
-        const res = await fetch("http://147.93.72.227:5000/api/users/projects", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(project),
-        });
+        const isEdit = Boolean(project.id);
+
+        const res = await fetch(
+          isEdit
+            ? `http://147.93.72.227:5000/api/users/projects/update/${project.id}`
+            : "http://147.93.72.227:5000/api/users/projects",
+          {
+            method: isEdit ? "PATCH" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(project),
+          }
+        );
 
         if (!res.ok) {
           throw new Error("Failed to save project");
         }
       }
 
-      toast.success("Projects added successfully");
+      toast.success(project ? "Project updated successfully" : "Projects added successfully");
+      onSave?.();
       setOpen(false);
-      setProjects([emptyProject]);
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ================= DELETE ================= */
+  const handleDelete = async () => {
+    if (!project?.id) return;
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this project?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `http://147.93.72.227:5000/api/users/projects/delete/${project.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Failed to delete project");
+      }
+
+      toast.success("Project deleted successfully");
+      onSave?.();
+      setOpen(false);
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -92,7 +159,6 @@ export default function UserProjectsModal({ open, setOpen }) {
                 Project {index + 1}
               </h3>
 
-              {/* Project title */}
               <div>
                 <label className="text-sm font-medium">Project title</label>
                 <input
@@ -100,11 +166,9 @@ export default function UserProjectsModal({ open, setOpen }) {
                   value={project.project_title}
                   onChange={(e) => handleChange(index, e)}
                   className="w-full border rounded-xl p-3 mt-2 text-sm"
-                  placeholder="Enter project title"
                 />
               </div>
 
-              {/* Client */}
               <div>
                 <label className="text-sm font-medium">Client</label>
                 <input
@@ -112,11 +176,9 @@ export default function UserProjectsModal({ open, setOpen }) {
                   value={project.client}
                   onChange={(e) => handleChange(index, e)}
                   className="w-full border rounded-xl p-3 mt-2 text-sm"
-                  placeholder="Enter client name"
                 />
               </div>
 
-              {/* Status */}
               <div>
                 <label className="text-sm font-medium">Project status</label>
                 <select
@@ -132,7 +194,6 @@ export default function UserProjectsModal({ open, setOpen }) {
                 </select>
               </div>
 
-              {/* Worked From */}
               <div>
                 <label className="text-sm font-medium">Worked from</label>
                 <div className="flex gap-4 mt-2">
@@ -156,18 +217,8 @@ export default function UserProjectsModal({ open, setOpen }) {
                   >
                     <option value="">Month</option>
                     {[
-                      "January",
-                      "February",
-                      "March",
-                      "April",
-                      "May",
-                      "June",
-                      "July",
-                      "August",
-                      "September",
-                      "October",
-                      "November",
-                      "December",
+                      "January","February","March","April","May","June",
+                      "July","August","September","October","November","December",
                     ].map((m) => (
                       <option key={m}>{m}</option>
                     ))}
@@ -175,7 +226,6 @@ export default function UserProjectsModal({ open, setOpen }) {
                 </div>
               </div>
 
-              {/* Details */}
               <div>
                 <label className="text-sm font-medium">
                   Details of project
@@ -187,7 +237,6 @@ export default function UserProjectsModal({ open, setOpen }) {
                   onChange={(e) => handleChange(index, e)}
                   rows={4}
                   className="w-full border rounded-xl p-4 mt-2 text-sm resize-none"
-                  placeholder="Describe your project..."
                 />
                 <div className="text-right text-xs text-gray-500 mt-1">
                   {maxChars - project.project_details.length} characters left
@@ -196,26 +245,41 @@ export default function UserProjectsModal({ open, setOpen }) {
             </div>
           ))}
 
-          {/* Add More */}
-          <button
-            onClick={addMoreProject}
-            className="text-blue-600 text-sm font-medium hover:underline"
-          >
-            + Add more details
-          </button>
+          {!project && (
+            <button
+              onClick={addMoreProject}
+              className="text-blue-600 text-sm font-medium hover:underline"
+            >
+              + Add more details
+            </button>
+          )}
         </div>
 
-        <DialogFooter className="mt-6">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="px-8 bg-blue-600 text-white"
-          >
-            {loading ? "Saving..." : "Save"}
-          </Button>
+        <DialogFooter className="mt-6 flex justify-between">
+          {/* DELETE (EDIT ONLY) */}
+          {project && (
+            <Button
+              variant="outline"
+              onClick={handleDelete}
+              disabled={loading}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
+              Delete
+            </Button>
+          )}
+
+          <div className="flex gap-3 ml-auto">
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="px-8 bg-blue-600 text-white"
+            >
+              {loading ? "Saving..." : project ? "Update" : "Save"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

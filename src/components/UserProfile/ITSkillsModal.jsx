@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -12,13 +12,40 @@ import { Button } from "@/components/ui/button";
 
 const proficiencyOptions = ["beginner", "intermediate", "advanced", "expert"];
 
-export default function ITSkillsModal({ open, setOpen }) {
+export default function ITSkillsModal({
+  open,
+  setOpen,
+  skillsData,
+  onSave,
+}) {
   const [skills, setSkills] = useState([
-    { skill_name: "", proficiency_level: "" },
+    { id: null, skill_name: "", proficiency_level: "" },
   ]);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  /* ================= PREFILL FOR EDIT ================= */
+  useEffect(() => {
+    if (open && skillsData && skillsData.length) {
+      setSkills(
+        skillsData.map((s) => ({
+          id: s.id,
+          skill_name: s.skill_name,
+          proficiency_level: s.proficiency_level,
+        }))
+      );
+    }
+  }, [open, skillsData]);
+
+  /* ================= RESET ================= */
+  useEffect(() => {
+    if (!open) {
+      setSkills([{ id: null, skill_name: "", proficiency_level: "" }]);
+      setError("");
+      setLoading(false);
+    }
+  }, [open]);
 
   const handleChange = (index, field, value) => {
     const updated = [...skills];
@@ -27,18 +54,43 @@ export default function ITSkillsModal({ open, setOpen }) {
   };
 
   const addSkillRow = () => {
-    setSkills([...skills, { skill_name: "", proficiency_level: "" }]);
+    setSkills([...skills, { id: null, skill_name: "", proficiency_level: "" }]);
   };
 
-  const removeSkillRow = (index) => {
+  /* ================= DELETE SKILL ================= */
+  const removeSkillRow = async (index) => {
+    const skill = skills[index];
+
+    // 🟢 If skill is already saved → delete from backend
+    if (skill.id) {
+      try {
+        const token = localStorage.getItem("token");
+
+        await fetch(
+          `http://147.93.72.227:5000/api/users/skills/delete/${skill.id}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            credentials: "include",
+          }
+        );
+      } catch (err) {
+        console.error("Delete skill failed", err);
+        setError("Failed to delete skill. Please try again.");
+        return;
+      }
+    }
+
+    // 🟡 Remove from UI
     const updated = skills.filter((_, i) => i !== index);
-    setSkills(updated);
+    setSkills(updated.length ? updated : [{ id: null, skill_name: "", proficiency_level: "" }]);
   };
 
   const handleSave = async () => {
     setError("");
 
-    // Validation
     for (let skill of skills) {
       if (!skill.skill_name || !skill.proficiency_level) {
         setError("Please fill all skill name and proficiency fields.");
@@ -55,26 +107,34 @@ export default function ITSkillsModal({ open, setOpen }) {
     try {
       setLoading(true);
 
-      const res = await fetch("http://147.93.72.227:5000/api/users/skills", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(skills),
-        credentials: "include",
-      });
+      for (const skill of skills) {
+        const isEdit = Boolean(skill.id);
 
-      const data = await res.json();
+        const res = await fetch(
+          isEdit
+            ? `http://147.93.72.227:5000/api/users/skills/update/${skill.id}`
+            : "http://147.93.72.227:5000/api/users/skills",
+          {
+            method: isEdit ? "PATCH" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              skill_name: skill.skill_name,
+              proficiency_level: skill.proficiency_level,
+            }),
+            credentials: "include",
+          }
+        );
 
-      if (!res.ok) {
-        setError(data?.message || "Failed to save skills.");
-        return;
+        if (!res.ok) {
+          throw new Error("Failed to save skills.");
+        }
       }
 
-      // Success → close modal & reset
+      onSave?.();
       setOpen(false);
-      setSkills([{ skill_name: "", proficiency_level: "" }]);
     } catch (err) {
       console.error("Skills save error:", err);
       setError("Something went wrong. Please try again.");
@@ -97,14 +157,12 @@ export default function ITSkillsModal({ open, setOpen }) {
           (Microsoft Word, Excel) and more, to show your technical expertise.
         </p>
 
-        {/* SKILLS LIST */}
         <div className="space-y-6 mt-6">
           {skills.map((skill, index) => (
             <div
               key={index}
               className="border rounded-xl p-4 space-y-4 relative"
             >
-              {/* Remove */}
               {skills.length > 1 && (
                 <button
                   onClick={() => removeSkillRow(index)}
@@ -114,12 +172,12 @@ export default function ITSkillsModal({ open, setOpen }) {
                 </button>
               )}
 
-              {/* Skill Name */}
               <div>
-                <label className="text-sm font-medium">Skill / Software name</label>
+                <label className="text-sm font-medium">
+                  Skill / Software name
+                </label>
                 <input
                   type="text"
-                  placeholder="e.g. ReactJS, Node.js"
                   value={skill.skill_name}
                   onChange={(e) =>
                     handleChange(index, "skill_name", e.target.value)
@@ -128,9 +186,10 @@ export default function ITSkillsModal({ open, setOpen }) {
                 />
               </div>
 
-              {/* Proficiency */}
               <div>
-                <label className="text-sm font-medium">Proficiency level</label>
+                <label className="text-sm font-medium">
+                  Proficiency level
+                </label>
                 <select
                   value={skill.proficiency_level}
                   onChange={(e) =>
@@ -150,7 +209,6 @@ export default function ITSkillsModal({ open, setOpen }) {
           ))}
         </div>
 
-        {/* Add More */}
         <button
           onClick={addSkillRow}
           className="mt-4 text-blue-600 text-sm font-medium"
@@ -160,12 +218,10 @@ export default function ITSkillsModal({ open, setOpen }) {
 
         {error && <p className="text-sm text-red-500 mt-3">{error}</p>}
 
-        {/* FOOTER */}
         <DialogFooter className="mt-8">
           <Button
             variant="outline"
             onClick={() => setOpen(false)}
-            className="px-6"
             disabled={loading}
           >
             Cancel
