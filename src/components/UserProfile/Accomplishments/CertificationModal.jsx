@@ -82,8 +82,8 @@ export default function CertificationModal({
       };
 
       const apiUrl = isEdit
-        ? `http://147.93.72.227:5000/api/users/certifications/${certification.id}`
-        : "http://147.93.72.227:5000/api/users/certifications";
+        ? `https://qa.api.rozgardwar.cloud/api/users/certifications/${certification.id}`
+        : "https://qa.api.rozgardwar.cloud/api/users/certifications";
 
       const method = isEdit ? "PUT" : "POST";
 

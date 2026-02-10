@@ -67,7 +67,7 @@ export default function ITSkillsModal({
         const token = localStorage.getItem("token");
 
         await fetch(
-          `http://147.93.72.227:5000/api/users/skills/delete/${skill.id}`,
+          `https://qa.api.rozgardwar.cloud/api/users/skills/delete/${skill.id}`,
           {
             method: "DELETE",
             headers: {
@@ -112,8 +112,8 @@ export default function ITSkillsModal({
 
         const res = await fetch(
           isEdit
-            ? `http://147.93.72.227:5000/api/users/skills/update/${skill.id}`
-            : "http://147.93.72.227:5000/api/users/skills",
+            ? `https://qa.api.rozgardwar.cloud/api/users/skills/update/${skill.id}`
+            : "https://qa.api.rozgardwar.cloud/api/users/skills",
           {
             method: isEdit ? "PATCH" : "POST",
             headers: {

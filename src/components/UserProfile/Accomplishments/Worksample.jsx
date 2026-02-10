@@ -86,8 +86,8 @@ export default function WorkSampleModal({
 
       const res = await fetch(
         isEdit
-          ? `http://147.93.72.227:5000/api/users/work-samples/${workSample.id}`
-          : "http://147.93.72.227:5000/api/users/work-samples",
+          ? `https://qa.api.rozgardwar.cloud/api/users/work-samples/${workSample.id}`
+          : "https://qa.api.rozgardwar.cloud/api/users/work-samples",
         {
           method: isEdit ? "PATCH" : "POST",
           headers: {
@@ -122,7 +122,7 @@ export default function WorkSampleModal({
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/users/work-samples/delete/${workSample.id}`,
+        `https://qa.api.rozgardwar.cloud/api/users/work-samples/delete/${workSample.id}`,
         {
           method: "DELETE",
           headers: {

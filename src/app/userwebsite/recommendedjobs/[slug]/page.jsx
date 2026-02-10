@@ -10,7 +10,7 @@ const extractIdFromSlug = (slug) => {
     const jobId = extractIdFromSlug(params.slug);
   
     const res = await fetch(
-      `http://147.93.72.227:5000/api/jobs/${jobId}`,
+      `https://qa.api.rozgardwar.cloud/api/jobs/${jobId}`,
       { cache: "no-store" }
     );
   

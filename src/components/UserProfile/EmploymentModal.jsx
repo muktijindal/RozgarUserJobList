@@ -112,8 +112,8 @@ export default function EmploymentModal({
       const isEdit = Boolean(employment?.id);
 
       const url = isEdit
-        ? `http://147.93.72.227:5000/api/users/experience/update/${employment.id}`
-        : "http://147.93.72.227:5000/api/users/experiences";
+        ? `https://qa.api.rozgardwar.cloud/api/users/experience/update/${employment.id}`
+        : "https://qa.api.rozgardwar.cloud/api/users/experiences";
 
       const method = isEdit ? "PATCH" : "POST";
 

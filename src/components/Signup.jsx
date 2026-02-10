@@ -40,7 +40,7 @@ const Signup = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://147.93.72.227:5000/api/users/register", {
+      const res = await fetch("https://qa.api.rozgardwar.cloud/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -75,7 +75,7 @@ const Signup = () => {
     setError("");
   
     try {
-      const res = await fetch("http://147.93.72.227:5000/otp/verify-otp", {
+      const res = await fetch("https://qa.api.rozgardwar.cloud/otp/verify-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
   

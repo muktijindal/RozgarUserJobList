@@ -48,7 +48,7 @@ export const Accomplisment = () => {
     try {
       setLoadingProfiles(true);
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/social-profiles",
+        "https://qa.api.rozgardwar.cloud/api/users/social-profiles",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -63,7 +63,7 @@ export const Accomplisment = () => {
     try {
       setLoadingWork(true);
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/work-samples",
+        "https://qa.api.rozgardwar.cloud/api/users/work-samples",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -78,7 +78,7 @@ export const Accomplisment = () => {
     try {
       setLoadingCertifications(true);
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/certifications",
+        "https://qa.api.rozgardwar.cloud/api/users/certifications",
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const data = await res.json();
@@ -101,7 +101,7 @@ export const Accomplisment = () => {
     try {
       setDeleting(true);
       const res = await fetch(
-        `http://147.93.72.227:5000/api/users/certifications/delete/${deleteId}`,
+        `https://qa.api.rozgardwar.cloud/api/users/certifications/delete/${deleteId}`,
         {
           method: "DELETE",
           headers: { Authorization: `Bearer ${token}` },

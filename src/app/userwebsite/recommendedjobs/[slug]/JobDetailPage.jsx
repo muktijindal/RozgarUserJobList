@@ -52,7 +52,7 @@ export default function JobDetailPage() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/jobs/applications/${job.category}/${job.job_id}/apply`,
+        `https://qa.api.rozgardwar.cloud/api/jobs/applications/${job.category}/${job.job_id}/apply`,
         {
           method: "POST",
           headers: {

@@ -39,7 +39,7 @@ export default function ProfileSections() {
       setLoadingProjects(true);
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://147.93.72.227:5000/api/users/projects", {
+      const res = await fetch("https://qa.api.rozgardwar.cloud/api/users/projects", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -68,7 +68,7 @@ export default function ProfileSections() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/educations",
+        "https://qa.api.rozgardwar.cloud/api/users/educations",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -95,7 +95,7 @@ export default function ProfileSections() {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/experiences",
+        "https://qa.api.rozgardwar.cloud/api/users/experiences",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -119,7 +119,7 @@ export default function ProfileSections() {
       setLoadingSkills(true);
       const token = localStorage.getItem("token");
 
-      const res = await fetch("http://147.93.72.227:5000/api/users/skills", {
+      const res = await fetch("https://qa.api.rozgardwar.cloud/api/users/skills", {
         headers: { Authorization: `Bearer ${token}` },
         credentials: "include",
       });

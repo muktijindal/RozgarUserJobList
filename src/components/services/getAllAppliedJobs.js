@@ -3,7 +3,7 @@ export const getAllAppliedJobs = async () => {
       const token = localStorage.getItem("token");
   
       const res = await fetch(
-        "http://147.93.72.227:5000/api/jobs/applications/user/all-applied/jobs",
+        "https://qa.api.rozgardwar.cloud/api/jobs/applications/user/all-applied/jobs",
         {
           method: "GET",
           headers: {

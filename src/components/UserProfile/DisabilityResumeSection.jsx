@@ -21,7 +21,7 @@ export default function DisabilityResumeSection() {
       if (!token) return;
 
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/resume/get",
+        "https://qa.api.rozgardwar.cloud/api/users/resume/get",
         {
           headers: {
             Authorization: `Bearer ${token}`,
