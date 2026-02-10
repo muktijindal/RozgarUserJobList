@@ -2,22 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { useState, useMemo } from "react";
 
-export const JobQuestionsModal = ({
-  open,
-  questions,
-  onClose,
-  onSubmit,
-}) => {
+export const JobQuestionsModal = ({ open, questions, onClose, onSubmit }) => {
   const [answers, setAnswers] = useState({});
   const [hasApplied, setHasApplied] = useState(false);
-
 
   const handleFinalApply = async () => {
     try {
       setApplying(true);
-  
+
       const token = localStorage.getItem("token");
-  
+
       const res = await fetch(
         `http://147.93.72.227:5000/api/jobs/applications/${job.category}/${job.job_id}/apply`,
         {
@@ -31,16 +25,16 @@ export const JobQuestionsModal = ({
           }),
         }
       );
-  
+
       const data = await res.json();
-  
+
       if (!res.ok) {
         throw new Error(data?.message || "Apply failed");
       }
-  
+
       console.log("Apply Success:", data);
-  
-      setHasApplied(true);            // ✅ MARK AS APPLIED
+
+      setHasApplied(true); // ✅ MARK AS APPLIED
       setShowConfirmModal(false);
       setShowSuccessModal(true);
     } catch (error) {
@@ -50,7 +44,6 @@ export const JobQuestionsModal = ({
       setApplying(false);
     }
   };
-  
 
   // ============================
   // 🔹 NORMALIZE QUESTIONS (HOOK SAFE)
@@ -105,11 +98,8 @@ export const JobQuestionsModal = ({
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
       <div className="bg-white rounded-xl w-full max-w-xl p-6 max-h-[80vh] overflow-y-auto">
-
         {/* HEADER */}
-        <h2 className="text-lg font-semibold mb-4">
-          Application Questions
-        </h2>
+        <h2 className="text-lg font-semibold mb-4">Application Questions</h2>
 
         {/* QUESTIONS */}
         <div className="space-y-6">
@@ -126,9 +116,7 @@ export const JobQuestionsModal = ({
               <div key={index}>
                 <p className="font-medium mb-2">
                   {index + 1}. {q.question || "Untitled question"}
-                  {q.mandatory && (
-                    <span className="text-red-500 ml-1">*</span>
-                  )}
+                  {q.mandatory && <span className="text-red-500 ml-1">*</span>}
                 </p>
 
                 {/* SINGLE CHOICE */}
@@ -200,9 +188,7 @@ export const JobQuestionsModal = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button onClick={() => onSubmit(answers)}>
-            Submit Application
-          </Button>
+          <Button onClick={() => onSubmit(answers)}>Submit Application</Button>
         </div>
       </div>
     </div>
