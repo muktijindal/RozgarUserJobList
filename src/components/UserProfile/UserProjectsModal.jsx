@@ -74,8 +74,8 @@ export default function UserProjectsModal({
 
         const res = await fetch(
           isEdit
-            ? `http://147.93.72.227:5000/api/users/projects/update/${project.id}`
-            : "http://147.93.72.227:5000/api/users/projects",
+            ? `https://qa.api.rozgardwar.cloud/api/users/projects/update/${project.id}`
+            : "https://qa.api.rozgardwar.cloud/api/users/projects",
           {
             method: isEdit ? "PATCH" : "POST",
             headers: {
@@ -115,7 +115,7 @@ export default function UserProjectsModal({
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/users/projects/delete/${project.id}`,
+        `https://qa.api.rozgardwar.cloud/api/users/projects/delete/${project.id}`,
         {
           method: "DELETE",
           headers: {

@@ -29,7 +29,7 @@ export default function EditBasicDetailsModal({ open, setOpen }) {
         const token = localStorage.getItem("token");
 
         const res = await fetch(
-          "http://147.93.72.227:5000/api/users/basic",
+          "https://qa.api.rozgardwar.cloud/api/users/basic",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function EditBasicDetailsModal({ open, setOpen }) {
       }
 
       await fetch(
-        "http://147.93.72.227:5000/api/users/profile/update/basic",
+        "https://qa.api.rozgardwar.cloud/api/users/profile/update/basic",
         {
           method: "PATCH",
           headers: {

@@ -2,7 +2,7 @@ export const getAllJobs = async () => {
   try {
     const token = localStorage.getItem("token"); // ✅ FIXED
 
-    const res = await fetch("http://147.93.72.227:5000/api/jobs/all-jobs", {
+    const res = await fetch("https://qa.api.rozgardwar.cloud/api/jobs/all-jobs", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,

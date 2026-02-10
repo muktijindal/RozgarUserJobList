@@ -59,7 +59,7 @@ export default function ResumeUploadModal({ open, setOpen }) {
       setLoading(true);
 
       const res = await fetch(
-        "http://147.93.72.227:5000/api/users/upload-resume",
+        "https://qa.api.rozgardwar.cloud/api/users/upload-resume",
         {
           method: "PATCH",
           headers: {

@@ -85,7 +85,7 @@ export const JobCard = ({
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
+        `https://qa.api.rozgardwar.cloud/api/savejob/${jobId}/save?type=HotVacancy`,
         {
           method: "POST",
           headers: {
@@ -118,7 +118,7 @@ export const JobCard = ({
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/savejob/${jobId}/save?type=HotVacancy`,
+        `https://qa.api.rozgardwar.cloud/api/savejob/${jobId}/save?type=HotVacancy`,
         {
           method: "DELETE",
           headers: {

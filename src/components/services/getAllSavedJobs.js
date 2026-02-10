@@ -3,7 +3,7 @@ export const getAllSavedJobs = async () => {
       const token = localStorage.getItem("token");
   
       const res = await fetch(
-        "http://147.93.72.227:5000/api/savejob/get/saved",
+        "https://qa.api.rozgardwar.cloud/api/savejob/get/saved",
         {
           method: "GET",
           headers: {
@@ -28,7 +28,7 @@ export const getAllSavedJobs = async () => {
 //     try {
 //       const token = localStorage.getItem("token"); // ✅ FIXED
   
-//       const res = await fetch("http://147.93.72.227:5000/api/savejob/get/saved'", {
+//       const res = await fetch("https://qa.api.rozgardwar.cloud/api/savejob/get/saved'", {
 //         method: "GET",
 //         headers: {
 //           Authorization: `Bearer ${token}`,

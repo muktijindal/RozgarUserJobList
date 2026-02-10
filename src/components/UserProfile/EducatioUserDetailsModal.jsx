@@ -99,8 +99,8 @@ export default function EducationUserDetailsModal({
 
       const res = await fetch(
         isEdit
-          ? `http://147.93.72.227:5000/api/users/educations/${education.id}`
-          : "http://147.93.72.227:5000/api/users/educations",
+          ? `https://qa.api.rozgardwar.cloud/api/users/educations/${education.id}`
+          : "https://qa.api.rozgardwar.cloud/api/users/educations",
         {
           method: isEdit ? "PATCH" : "POST",
           headers: {
@@ -157,7 +157,7 @@ export default function EducationUserDetailsModal({
       setDeleting(true);
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/users/educations/delete/${education.id}`,
+        `https://qa.api.rozgardwar.cloud/api/users/educations/delete/${education.id}`,
         {
           method: "DELETE",
           headers: {

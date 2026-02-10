@@ -53,8 +53,8 @@ export default function OnlineProfileModal({ open, onClose, profile, onSave }) {
 
       const res = await fetch(
         isEdit
-          ? `http://147.93.72.227:5000/api/users/social-profiles/${profile.id}`
-          : "http://147.93.72.227:5000/api/users/social-profiles",
+          ? `https://qa.api.rozgardwar.cloud/api/users/social-profiles/${profile.id}`
+          : "https://qa.api.rozgardwar.cloud/api/users/social-profiles",
         {
           method: isEdit ? "PATCH" : "POST",
           headers: {
@@ -89,7 +89,7 @@ export default function OnlineProfileModal({ open, onClose, profile, onSave }) {
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://147.93.72.227:5000/api/users/social-profiles/delete/${profile.id}`,
+        `https://qa.api.rozgardwar.cloud/api/users/social-profiles/delete/${profile.id}`,
         {
           method: "DELETE",
           headers: {

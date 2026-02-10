@@ -47,8 +47,8 @@ jobs:
           script: |
             cd /var/www/qa/RozgarUserJobList
             npm install --omit=dev
-            pm2 delete rozgar-qa || true
-            PORT=9999 pm2 start npm --name "rozgar-qa" -- start 
+            pm2 delete rozgar-user-website-qa || true
+            PORT=9999 pm2 start npm --name "rozgar-user-website-qa" -- start
             pm2 save
 
       # ---------- PROD ----------
@@ -73,6 +73,6 @@ jobs:
           script: |
             cd /var/www/prod/RozgarUserJobList
             npm install --omit=dev
-            pm2 delete rozgar-prod || true
-            PORT=8888 pm2 start npm --name "rozgar-prod" -- start 
+            pm2 delete rozgar-user-website-prod || true
+            PORT=8888 pm2 start npm --name "rozgar-user-website-prod" -- start
             pm2 save
