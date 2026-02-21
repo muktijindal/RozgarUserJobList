@@ -62,7 +62,7 @@ export const Navbar = () => {
         <nav className="px-4">
           <ul className="flex flex-col items-center space-y-6 mt-4">
             <li>
-              <Link href="/userwebsite">Home</Link>
+              {/* <Link href="/userwebsite">Home</Link> */}
             </li>
             <li>
               <Link href="/userwebsite/recommendedjobs">Jobs</Link>
@@ -103,9 +103,9 @@ export const Navbar = () => {
         <nav className="hidden md:block">
           <ul className="flex space-x-6 text-sm">
             <li>
-              <Link href="/userwebsite" className="hover:text-[#A270FF]">
+              {/* <Link href="/userwebsite" className="hover:text-[#A270FF]">
                 Home
-              </Link>
+              </Link> */}
             </li>
             <li>
               <Link
