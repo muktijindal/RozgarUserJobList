@@ -89,15 +89,11 @@ const Signup = () => {
         onSubmit={handleSubmit}
         className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-5"
       >
-        <h2 className="text-2xl font-bold text-center">
-          Create Account
-        </h2>
+        <h2 className="text-2xl font-bold text-center">Create Account</h2>
 
         {/* Full Name */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Full Name
-          </label>
+          <label className="block text-sm font-medium mb-1">Full Name</label>
           <input
             type="text"
             name="fullName"
@@ -149,15 +145,13 @@ const Signup = () => {
 
         {/* Password */}
         <div>
-          <label className="block text-sm font-medium mb-1">
-            Password
-          </label>
+          <label className="block text-sm font-medium mb-1">Password</label>
 
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               name="password"
-            placeholder="Enter you password"
+              placeholder="Enter you password"
               value={formData.password}
               onChange={handleChange}
               className={`${inputBase} border-gray-300`}
@@ -182,7 +176,7 @@ const Signup = () => {
             <input
               type={showConfirmPassword ? "text" : "password"}
               name="confirmPassword"
-            placeholder="Enter you confirm password"
+              placeholder="Enter you confirm password"
               value={formData.confirmPassword}
               onChange={handleChange}
               className={`${inputBase} ${
@@ -195,9 +189,7 @@ const Signup = () => {
               required
             />
             <span
-              onClick={() =>
-                setShowConfirmPassword(!showConfirmPassword)
-              }
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="absolute right-3 top-3 cursor-pointer text-gray-600"
             >
               {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
@@ -207,14 +199,10 @@ const Signup = () => {
           {formData.confirmPassword && (
             <p
               className={`text-xs mt-1 ${
-                isPasswordMatch
-                  ? "text-green-600"
-                  : "text-red-500"
+                isPasswordMatch ? "text-green-600" : "text-red-500"
               }`}
             >
-              {isPasswordMatch
-                ? "Passwords match ✓"
-                : "Passwords do not match"}
+              {isPasswordMatch ? "Passwords match ✓" : "Passwords do not match"}
             </p>
           )}
         </div>
