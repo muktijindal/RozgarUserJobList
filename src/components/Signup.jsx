@@ -1,8 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const Signup = () => {
+  const router = useRouter();
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -11,14 +19,14 @@ const Signup = () => {
     phone: "",
   });
 
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
 
-  // OTP states
-  const [showOtp, setShowOtp] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
+  const isPasswordMatch =
+    formData.password &&
+    formData.confirmPassword &&
+    formData.password === formData.confirmPassword;
+
+  const isPhoneValid = /^(\+91)?[6-9]\d{9}$/.test(formData.phone);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,219 +35,198 @@ const Signup = () => {
     });
   };
 
-  // ▶ Signup API
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match!");
+    if (!isPhoneValid) {
+      toast.error("Enter valid Indian phone number (+91 optional)");
       return;
     }
 
-    setError("");
+    if (!isPasswordMatch) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const res = await fetch("https://qa.api.rozgardwar.cloud/api/users/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-          phone: formData.phone,
-        }),
-      });
+      const res = await fetch(
+        "https://qa.api.rozgardwar.cloud/api/users/register",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            full_name: formData.fullName,
+            email: formData.email,
+            password: formData.password,
+            phone: formData.phone,
+          }),
+        }
+      );
 
       const data = await res.json();
-      console.log("Signup Response:", data);
 
       if (!res.ok) {
-        setError(data?.message || "Signup failed!");
+        toast.error(data?.message || "Signup failed");
       } else {
-        setSuccessMsg("Account created! Enter OTP sent to your email.");
-        setShowOtp(true);
+        toast.success("Account created successfully!");
+        router.push(`/verify?email=${formData.email}`);
       }
     } catch (err) {
-      console.error(err);
-      setError("Something went wrong!");
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  // ▶ OTP VERIFY API
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    setOtpLoading(true);
-    setError("");
-  
-    try {
-      const res = await fetch("https://qa.api.rozgardwar.cloud/otp/verify-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-  
-        body: JSON.stringify({
-          email: formData.email,
-          otp: otp,
-          role: "user", 
-        }),
-      });
-  
-      const data = await res.json();
-      console.log("OTP Verify Response:", data);
-  
-      if (!res.ok) {
-        setError(data?.message || "Invalid OTP!");
-      } else {
-        window.location.href = "/";
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong!");
-    } finally {
-      setOtpLoading(false);
-    }
-  };
-  
+  const inputBase =
+    "w-full border p-2.5 rounded-lg focus:outline-none transition";
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center px-4">
-      <div className="w-full max-w-lg bg-white shadow-xl rounded-xl p-8 border border-gray-200">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-xl shadow-lg w-full max-w-md space-y-5"
+      >
+        <h2 className="text-2xl font-bold text-center">
+          Create Account
+        </h2>
 
-        {/* SIGNUP FORM */}
-        {!showOtp ? (
-          <>
-            <h2 className="text-3xl font-bold text-gray-800 text-center mb-6">
-              Create Account
-            </h2>
+        {/* Full Name */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Full Name
+          </label>
+          <input
+            type="text"
+            name="fullName"
+            placeholder="Enter you name"
+            value={formData.fullName}
+            onChange={handleChange}
+            className={`${inputBase} border-gray-300 focus:ring-2 focus:ring-indigo-500`}
+            required
+          />
+        </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Full Name */}
-              <div>
-                <label className="text-gray-700 font-medium">Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-2 border px-4 py-2 rounded-lg"
-                />
-              </div>
+        {/* Email */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Email Address
+          </label>
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter you email"
+            value={formData.email}
+            onChange={handleChange}
+            className={`${inputBase} border-gray-300 focus:ring-2 focus:ring-indigo-500`}
+            required
+          />
+        </div>
 
-              {/* Email */}
-              <div>
-                <label className="text-gray-700 font-medium">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="example@mail.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-2 border px-4 py-2 rounded-lg"
-                />
-              </div>
+        {/* Phone */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Phone Number (+91)
+          </label>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            placeholder="Enter you number"
+            className={`${inputBase} ${
+              formData.phone
+                ? isPhoneValid
+                  ? "border-green-500"
+                  : "border-red-500"
+                : "border-gray-300"
+            }`}
+            required
+          />
+        </div>
 
-              {/* Phone */}
-              <div>
-                <label className="text-gray-700 font-medium">Phone Number</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="9876543210"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  required
-                  className="w-full mt-2 border px-4 py-2 rounded-lg"
-                />
-              </div>
+        {/* Password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Password
+          </label>
 
-              {/* Passwords */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-gray-700 font-medium">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    className="w-full mt-2 border px-4 py-2 rounded-lg"
-                  />
-                </div>
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              name="password"
+            placeholder="Enter you password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`${inputBase} border-gray-300`}
+              required
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-3 cursor-pointer text-gray-600"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
+        </div>
 
-                <div>
-                  <label className="text-gray-700 font-medium">
-                    Confirm Password
-                  </label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    className="w-full mt-2 border px-4 py-2 rounded-lg"
-                  />
-                </div>
-              </div>
+        {/* Confirm Password */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Confirm Password
+          </label>
 
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-              {successMsg && (
-                <p className="text-green-600 text-sm text-center">{successMsg}</p>
-              )}
+          <div className="relative">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              name="confirmPassword"
+            placeholder="Enter you confirm password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              className={`${inputBase} ${
+                formData.confirmPassword
+                  ? isPasswordMatch
+                    ? "border-green-500"
+                    : "border-red-500"
+                  : "border-gray-300"
+              }`}
+              required
+            />
+            <span
+              onClick={() =>
+                setShowConfirmPassword(!showConfirmPassword)
+              }
+              className="absolute right-3 top-3 cursor-pointer text-gray-600"
+            >
+              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-indigo-600 text-white py-3 font-semibold rounded-lg hover:bg-indigo-700 disabled:bg-gray-400"
-              >
-                {loading ? "Creating Account..." : "Sign Up"}
-              </button>
-            </form>
-
-            <p className="text-center text-gray-700 mt-4 text-sm">
-              Already have an account?{" "}
-              <a href="/login" className="text-indigo-600 font-semibold">
-                Login
-              </a>
+          {formData.confirmPassword && (
+            <p
+              className={`text-xs mt-1 ${
+                isPasswordMatch
+                  ? "text-green-600"
+                  : "text-red-500"
+              }`}
+            >
+              {isPasswordMatch
+                ? "Passwords match ✓"
+                : "Passwords do not match"}
             </p>
-          </>
-        ) : (
-          // ⭐ OTP SCREEN
-          <>
-            <h2 className="text-2xl font-bold text-gray-800 text-center mb-4">
-              Verify OTP
-            </h2>
-            <p className="text-center text-gray-600 mb-6">
-              Enter the OTP sent to <strong>{formData.email}</strong>
-            </p>
+          )}
+        </div>
 
-            <form onSubmit={handleOtpSubmit} className="space-y-5">
-              <input
-                type="text"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                placeholder="Enter OTP"
-                required
-                className="w-full border px-4 py-3 text-lg text-center rounded-lg tracking-widest"
-              />
-
-              {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-
-              <button
-                type="submit"
-                disabled={otpLoading}
-                className="w-full bg-green-600 text-white py-3 font-semibold rounded-lg hover:bg-green-700 disabled:bg-gray-400"
-              >
-                {otpLoading ? "Verifying..." : "Verify OTP"}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-indigo-600 text-white py-2.5 rounded-lg hover:bg-indigo-700 transition disabled:bg-gray-400"
+        >
+          {loading ? "Creating..." : "Sign Up"}
+        </button>
+      </form>
     </div>
   );
 };
