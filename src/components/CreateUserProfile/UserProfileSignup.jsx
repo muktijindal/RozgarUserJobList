@@ -24,7 +24,7 @@ export default function UserProfileSignup() {
       <div className="flex justify-end px-8 py-4 text-sm">
         <span className="text-gray-600">
           Already Registered?{" "}
-          <a href="/login" className="text-blue-600 font-medium">
+          <a href="/" className="text-blue-600 font-medium">
             Login
           </a>{" "}
           here

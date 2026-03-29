@@ -38,7 +38,7 @@ const ForgotPassword = () => {
 
       // optional redirect
       setTimeout(() => {
-        router.push("/login");
+        router.push("/");
       }, 2000);
 
     } catch (error) {
@@ -64,7 +64,7 @@ const ForgotPassword = () => {
             <button
               onClick={() => {
                 setShowModal(false);
-                router.push("/login");
+                router.push("/");
               }}
               className="px-4 py-2 bg-indigo-600 text-white rounded"
             >
@@ -106,7 +106,7 @@ const ForgotPassword = () => {
 
           <p className="text-center text-sm mt-6 text-gray-600">
             Remembered your password?{" "}
-            <a href="/login" className="text-indigo-600 font-semibold">
+            <a href="/" className="text-indigo-600 font-semibold">
               Login
             </a>
           </p>

@@ -13,7 +13,7 @@ export default function VerifyClient({ email }) {
 
   useEffect(() => {
     if (!email) {
-      router.push("/login");
+      router.push("/");
     }
   }, [email, router]);
 
@@ -66,7 +66,7 @@ export default function VerifyClient({ email }) {
       if (!res.ok) {
         setError(data?.message || "Invalid OTP");
       } else {
-        router.push("/login");
+        router.push("/");
       }
     } catch (err) {
       setError("Something went wrong");
@@ -116,7 +116,7 @@ export default function VerifyClient({ email }) {
         </form>
 
         <button
-          onClick={() => router.push("/login")}
+          onClick={() => router.push("/")}
           className="mt-4 text-sm text-indigo-600"
         >
           Back to Login

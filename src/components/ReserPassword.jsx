@@ -93,7 +93,7 @@ const ResetPassword = () => {
 
         <p className="text-center text-sm mt-4 text-gray-600">
           Back to{" "}
-          <a href="/login" className="text-indigo-600 font-semibold">
+          <a href="/" className="text-indigo-600 font-semibold">
             Login
           </a>
         </p>

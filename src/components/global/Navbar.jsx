@@ -28,7 +28,7 @@ export const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("token"); // 🔑 clear auth token
     setIsDropdownOpen(false);
-    router.push("/login"); // redirect after logout
+    router.push("/"); // redirect after logout
   };
 
   // 🚫 Hide navbar on auth pages
