@@ -221,7 +221,7 @@ export default function ProfileSections() {
               <p className="text-sm text-gray-400">No employment added yet.</p>
             )}
 
-            {experiences.map((exp) => (
+            {experiences?.map((exp) => (
               <div
                 key={exp.id}
                 className="border rounded-xl p-4 flex justify-between items-start"

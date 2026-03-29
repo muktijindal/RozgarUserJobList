@@ -17,7 +17,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-blue-600 rounded-full" />
-              <h2 className="text-3xl font-semibold text-blue-600">naukri</h2>
+              <h2 className="text-3xl font-semibold text-blue-600">Rozgar Dwar</h2>
             </div>
 
             <h3 className="mt-6 font-medium">Connect with us</h3>

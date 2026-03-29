@@ -32,7 +32,7 @@ export const Navbar = () => {
   };
 
   // 🚫 Hide navbar on auth pages
-  const hideNavbarRoutes = ["/login", "/signup", "/forgotpassword"];
+  const hideNavbarRoutes = ["/", "/signup", "/forgotpassword"];
   if (hideNavbarRoutes.includes(pathname)) {
     return null;
   }
