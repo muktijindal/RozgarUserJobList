@@ -31,7 +31,7 @@ export default function DisabilityResumeSection() {
 
       const data = await res.json();
       if (res.ok) {
-        setResumeData(data?.data || null);
+        setResumeData(data?.resume || null);
       }
     } catch (err) {
       console.error("Failed to fetch resume", err);
@@ -47,10 +47,7 @@ export default function DisabilityResumeSection() {
   return (
     <div className="space-y-6">
       {/* Resume Upload Modal */}
-      <ResumeUploadModal
-        open={openResumeModal}
-        setOpen={setOpenResumeModal}
-      />
+      <ResumeUploadModal open={openResumeModal} setOpen={setOpenResumeModal} />
 
       {/* ================= DISABILITY SECTION ================= */}
       <Card className="bg-white p-6 rounded-2xl shadow-sm">
@@ -110,25 +107,43 @@ export default function DisabilityResumeSection() {
               <p className="text-sm text-gray-500">Checking resume...</p>
             ) : resumeData?.resume_url ? (
               <>
-                <p className="text-sm font-medium text-gray-800">
-                  Resume uploaded
-                </p>
+                <div className="flex items-center justify-between bg-gray-50 border rounded-xl p-4 hover:shadow-sm transition">
+                  {/* LEFT SIDE */}
+                  <div className="flex items-center gap-3">
+                    {/* File Icon */}
+                    <div className="w-10 h-10 flex items-center justify-center bg-blue-100 text-blue-600 rounded-lg text-lg">
+                      📄
+                    </div>
 
-                <a
-                  href={resumeData.resume_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-sm text-blue-600 block mt-1"
-                >
-                  View / Download Resume
-                </a>
+                    {/* Resume Info */}
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-gray-800">
+                        {resumeData?.resume_title || "Resume uploaded"}
+                      </p>
 
-                <button
-                  onClick={() => setOpenResumeModal(true)}
-                  className="mt-3 text-sm text-blue-600 underline"
-                >
-                  Replace resume
-                </button>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        PDF • Ready to share with recruiters
+                      </p>
+
+                      <a
+                        href={resumeData.resume_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-blue-600 mt-1 inline-block hover:underline"
+                      >
+                        View / Download
+                      </a>
+                    </div>
+                  </div>
+
+                  {/* RIGHT SIDE ACTION */}
+                  <button
+                    onClick={() => setOpenResumeModal(true)}
+                    className="text-sm font-medium text-blue-600 hover:text-blue-700 border border-blue-600 px-3 py-1.5 rounded-lg hover:bg-blue-50 transition"
+                  >
+                    Replace
+                  </button>
+                </div>
               </>
             ) : (
               <>
@@ -138,7 +153,7 @@ export default function DisabilityResumeSection() {
                     className="text-blue-600 cursor-pointer"
                     onClick={() => setOpenResumeModal(true)}
                   >
-                    Upload resume
+                    Upload Updated resume
                   </span>
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
