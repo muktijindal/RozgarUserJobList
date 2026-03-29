@@ -87,7 +87,11 @@ export const UserDetails = () => {
 
   return (
     <>
-      <EditBasicDetailsModal open={open} setOpen={setOpen} />
+      <EditBasicDetailsModal
+        open={open}
+        setOpen={setOpen}
+        onSuccess={fetchUserBasic} // ✅ ADD THIS
+      />
 
       <input
         ref={fileInputRef}
@@ -120,9 +124,7 @@ export const UserDetails = () => {
 
               <div className="flex-1">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-2xl font-semibold">
-                    {user?.full_name}
-                  </h3>
+                  <h3 className="text-2xl font-semibold">{user?.full_name}</h3>
                   <button
                     className="text-lg text-gray-400"
                     onClick={() => setOpen(true)}
@@ -132,28 +134,25 @@ export const UserDetails = () => {
                 </div>
 
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-600">
-                  <div>📧 Email: {user?.email || "—"}</div>
-                  <div>📱 Phone: {user?.phone || "—"}</div>
+                  <div>Email: {user?.email || "—"}</div>
+                  <div>Phone: {user?.phone || "—"}</div>
                   <div>
-                    📍 Location: {user?.current_location},{" "}
+                    Location: {user?.current_location},{" "}
                     {user?.current_location_country}
                   </div>
                   <div>
-                    👤 Work Status:{" "}
+                    Work Status:{" "}
                     {user?.work_status === "fresher"
                       ? "Fresher"
                       : "Experienced"}
                   </div>
                   <div>
-                    🧠 Experience: {user?.total_experience_years} yrs{" "}
+                    Experience: {user?.total_experience_years} yrs{" "}
                     {user?.total_experience_months} mos
                   </div>
+                  <div>Availability: {user?.availability_to_join || "—"}</div>
                   <div>
-                    📅 Availability:{" "}
-                    {user?.availability_to_join || "—"}
-                  </div>
-                  <div>
-                    🛑 Last Working Day:{" "}
+                    Last Working Day:{" "}
                     {formatDate(user?.Expected_last_working_day)}
                   </div>
                 </div>
@@ -166,24 +165,18 @@ export const UserDetails = () => {
                 <div className="flex flex-col gap-3">
                   <div className="flex justify-between">
                     <span>Verify mobile number</span>
-                    <Badge className="bg-green-100 text-green-700">
-                      +10%
-                    </Badge>
+                    <Badge className="bg-green-100 text-green-700">+10%</Badge>
                   </div>
                   <div className="flex justify-between">
                     <span>Verify email</span>
-                    <Badge className="bg-green-100 text-green-700">
-                      +5%
-                    </Badge>
+                    <Badge className="bg-green-100 text-green-700">+5%</Badge>
                   </div>
 
                   <Button
                     asChild
                     className="mt-4 w-full bg-rose-500 text-white"
                   >
-                    <Link href="/pending-action">
-                      Complete your profile
-                    </Link>
+                    <Link href="/pending-action">Complete your profile</Link>
                   </Button>
                 </div>
               </div>
