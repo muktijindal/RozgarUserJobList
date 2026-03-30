@@ -10,6 +10,7 @@ import EducationUserDetailsModal from "../EducatioUserDetailsModal";
 import KeySkillsModal from "../KeySkillsDetailsModal";
 import HeadlineModal from "../HeadlineModal";
 import EmploymentModal from "../EmploymentModal";
+import PersonalDetailsCard from "../PersonalDetailsCard";
 
 export default function ProfileSections() {
   const [openSummary, setopenSummary] = useState(false);
@@ -142,7 +143,7 @@ export default function ProfileSections() {
   return (
     <div className="space-y-6">
       {/* Resume Headline */}
-      <Card className="rounded-2xl shadow-sm bg-white p-0">
+      <Card className="rounded-2xl shadow-sm bg-white mt-5 p-0">
         <CardContent className="px-6 py-5">
           <div className="flex justify-between items-center">
             <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -473,6 +474,7 @@ export default function ProfileSections() {
       </Card>
 
       <Accomplisment />
+      <PersonalDetailsCard />
 
       <UserProjectsModal
         open={openProjects}

@@ -10,6 +10,8 @@ import EducationUserDetailsModal from "./EducatioUserDetailsModal";
 import ITSkillsModal from "./ITSkillsModal";
 import ProfileSummaryModal from "./ProfileSummaryModal";
 import UserProjectsModal from "./UserProjectsModal";
+import PersonalDetailsModal from "./PersonalDetailsModal";
+
 
 export const QuickLinksUserProfile = () => {
   const [openResume, setOpenResume] = useState(false);
@@ -20,6 +22,9 @@ export const QuickLinksUserProfile = () => {
   const [openProjects, setopenProjects] = useState(false);
   const [openSummary, setopenSummary] = useState(false);
 
+  // ✅ NEW STATE
+  const [openPersonalDetails, setOpenPersonalDetails] = useState(false);
+
   const handleClick = (item) => {
     if (item === "Resume") setOpenResume(true);
     if (item === "Resume headline") setOpenHeadline(true);
@@ -28,6 +33,9 @@ export const QuickLinksUserProfile = () => {
     if (item === "IT skills") setopenITSkills(true);
     if (item === "Projects") setopenProjects(true);
     if (item === "Profile summary") setopenSummary(true);
+
+    // ✅ HANDLE PERSONAL DETAILS
+    if (item === "Personal Details") setOpenPersonalDetails(true);
   };
 
   const listItems = [
@@ -43,16 +51,15 @@ export const QuickLinksUserProfile = () => {
     "Personal Details",
   ];
 
-  // items where Add/Upload must NOT be shown
+
   const noAddButtonItems = [
     "Accomplishments",
     "Career Profile",
-    "Personal Details",
   ];
 
   return (
     <>
-      {/* ALL MODALS */}
+
       <ResumeUploadModal open={openResume} setOpen={setOpenResume} />
       <HeadlineModal open={openHeadline} setOpen={setOpenHeadline} />
       <KeySkillsModal open={openSkills} setOpen={setOpenSkills} />
@@ -60,6 +67,12 @@ export const QuickLinksUserProfile = () => {
       <ITSkillsModal open={openITSkills} setOpen={setopenITSkills} />
       <UserProjectsModal open={openProjects} setOpen={setopenProjects} />
       <ProfileSummaryModal open={openSummary} setOpen={setopenSummary} />
+
+
+      <PersonalDetailsModal
+        open={openPersonalDetails}
+        setOpen={setOpenPersonalDetails}
+      />
 
       <div className="lg:col-span-4">
         <Card className="rounded-xl px-2">
@@ -73,11 +86,11 @@ export const QuickLinksUserProfile = () => {
                 <li key={item} className="flex items-center justify-between">
                   <span>{item}</span>
 
-                  {/* SHOW BUTTON ONLY IF NOT IN noAddButtonItems */}
+                  {/* ✅ NOW PERSONAL DETAILS WILL ALSO SHOW BUTTON */}
                   {!noAddButtonItems.includes(item) && (
                     <button
                       onClick={() => handleClick(item)}
-                      className="text-blue-600 text-sm cursor-pointer"
+                      className="text-blue-600 text-sm cursor-pointer hover:underline"
                     >
                       {item === "Resume" ? "Upload" : "Add"}
                     </button>
