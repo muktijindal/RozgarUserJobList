@@ -204,7 +204,6 @@ export default function PersonalDetailsCard() {
         )}
       </div>
 
-      {/* ✅ MODAL */}
       <PersonalDetailsModal
         open={openModal}
         setOpen={setOpenModal}
